@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C和C++的面向对象专题（5）——合理使用模板，避免代码冗余 | 西风广场</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+五、合理使用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C和C++的面向对象专题（5）——合理使用模板，避免代码冗余">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/03/28/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/index.html">
+<meta property="og:site_name" content="西风广场">
+<meta property="og:description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+五、合理使用">
+<meta property="og:updated_time" content="2015-11-13T07:23:57.306Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C和C++的面向对象专题（5）——合理使用模板，避免代码冗余">
+<meta name="twitter:description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+五、合理使用">
+  
+    <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">西风逍遥游</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/tags/随笔">随笔</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+					        
+								<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.vvliebe.com/">vvliebe的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">西风逍遥游，一只热爱生活的技术粉</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">西风逍遥游</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">西风逍遥游</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+			        
+						<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/03/28/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/" class="article-date">
+  	<time datetime="2016-03-28T15:45:02.484Z" itemprop="datePublished">2016-03-28</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C和C++的面向对象专题（5）——合理使用模板，避免代码冗余
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>本专栏文章列表</strong></p>
+<p>一、何为面向对象</p>
+<p>二、C语言也能实现面向对象</p>
+<p>三、C++中的不优雅特性</p>
+<p>四、解决封装，避免接口</p>
+<p>五、合理使用模板，避免代码冗余</p>
+<p>六、C++也能反射</p>
+<p>七、单例模式解决静态成员对象和全局对象的构造顺序难题</p>
+<p>八、更为高级的预处理器PHP</p>
+<p>九、Gtkmm的最佳实践</p>
+<p>本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 <a href="http://sunxfancy.github.io/">http://sunxfancy.github.io/</a></p>
+<h2 id="五、合理使用模板，避免代码冗余"><a href="#五、合理使用模板，避免代码冗余" class="headerlink" title="五、合理使用模板，避免代码冗余"></a>五、合理使用模板，避免代码冗余</h2><p>下面我们来讨论一下，如何解决模板的不易封装的问题。</p>
+<p>我们提供这样一种思路，对于链表一类的通用类型，我们尽量采取强制类型转换的方式，尽量避免模板的滥用。</p>
+<p>同样，我们应该避免对结构体的直接存储，尽量使用类似java的指针传递方式来传递对象。</p>
+<p>我们首先来写一个单类型的list</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#ifndef LIST_C_H</span><br><span class="line">#define LIST_C_H</span><br><span class="line"></span><br><span class="line">class list_c_private;</span><br><span class="line">struct list_c_node;</span><br><span class="line"></span><br><span class="line">class list_c &#123;</span><br><span class="line">public:</span><br><span class="line">truelist_c();</span><br><span class="line">true~list_c();</span><br><span class="line"></span><br><span class="line">truevoid insert(void*);</span><br><span class="line">trueint size();</span><br><span class="line">truevoid* get(int);</span><br><span class="line"></span><br><span class="line">protected:</span><br><span class="line">truelist_c_private* priv;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">#endif // LIST_C_H</span><br></pre></td></tr></table></figure>
+<p>这里我们使用了上面讲到的封装方式，降低了类间的耦合度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;list_c.h&quot;</span><br><span class="line"></span><br><span class="line">class list_c_private</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">trueint size;</span><br><span class="line">truelist_c_node* head;</span><br><span class="line">&#125;;	</span><br><span class="line"></span><br><span class="line">struct list_c_node</span><br><span class="line">&#123;</span><br><span class="line">truevoid* data;</span><br><span class="line">truelist_c_node* next;</span><br><span class="line"></span><br><span class="line">truelist_c_node() &#123;</span><br><span class="line">truetruedata = next = nullptr;</span><br><span class="line">true&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">list_c::list_c() &#123;</span><br><span class="line">truepriv = new list_c_private();</span><br><span class="line">truepriv-&gt;head = new list_c_node();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">list_c::~list_c() &#123;</span><br><span class="line">truedelete priv;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void list_c::insert(void* data) &#123;</span><br><span class="line">truelist_c_node* p;</span><br><span class="line">truefor (p = priv-&gt;head; p-&gt;next != nullptr; p = p-&gt;next) &#123;&#125;</span><br><span class="line">truep-&gt;next = new list_c_node();</span><br><span class="line">truep-&gt;next-&gt;data = data;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">int list_c::size() &#123;</span><br><span class="line">truereturn priv-&gt;size;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void* list_c::get(int k) &#123;</span><br><span class="line">trueint t; list_c_node* p;</span><br><span class="line">truefor (p = priv-&gt;head-&gt;next, t = 0; p != nullptr &amp;&amp; t != k ; p = p-&gt;next, ++t) &#123;&#125;</span><br><span class="line">truereturn p-&gt;data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这是一个简单的链表，只是作为示例使用，写了插入和获取的两个方法。</p>
+<p>而为了通用性支持，我们写一个模板，进行类型的强制转换：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#ifndef LIST</span><br><span class="line">#define LIST</span><br><span class="line"></span><br><span class="line">#include &quot;list_c.h&quot;</span><br><span class="line"></span><br><span class="line">template&lt;typename T&gt;</span><br><span class="line">class list &#123;</span><br><span class="line">public:</span><br><span class="line">truelist() &#123; clist = new list_c(); &#125;</span><br><span class="line">true~list() &#123; delete clist; &#125;</span><br><span class="line"></span><br><span class="line">truevoid insert(T data) &#123;</span><br><span class="line">truetrueclist-&gt;insert((void*)data);</span><br><span class="line">true&#125;</span><br><span class="line"></span><br><span class="line">trueint size() &#123; return clist-&gt;size(); &#125;</span><br><span class="line"></span><br><span class="line">trueT get(int k) &#123;</span><br><span class="line">truetruereturn (T)clist-&gt;get(k);</span><br><span class="line">true&#125;</span><br><span class="line"></span><br><span class="line">protected:</span><br><span class="line">truelist_c* clist;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">#endif // LIST</span><br></pre></td></tr></table></figure>
+<p>这样，带来的好处有，首先能够将模板封装操作，其次，能够在封装类中，动态的调整内部实例。<br>对于一个传入的类型，你可以判断一下，是否适合当前的模板，如果不适合，可以在其中动态的报错。</p>
+<p>最后是模板的使用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &quot;list&quot;</span><br><span class="line">using namespace std;</span><br><span class="line"></span><br><span class="line">int main()&#123;</span><br><span class="line">truelist&lt;long&gt; testlist;</span><br><span class="line">truetestlist.insert(10);</span><br><span class="line">truetestlist.insert(20);</span><br><span class="line"></span><br><span class="line">truelong k = testlist.get(1);</span><br><span class="line">trueprintf(&quot;%d\n&quot;, k);</span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/03/28/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          C和C++的面向对象专题（4）——解决封装，避免接口
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/03/28/C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">C和C++的面向对象专题（6）——C++也能反射</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余" data-title="C和C++的面向对象专题（5）——合理使用模板，避免代码冗余" data-url="http://sunxfancy.github.io/2016/03/28/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 西风逍遥游
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
