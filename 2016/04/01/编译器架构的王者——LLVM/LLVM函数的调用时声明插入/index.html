@@ -5,15 +5,22 @@
   
   <title>西风广场</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="横笛笑看今古事，立剑醉谈定江山">
-<meta property="og:type" content="website">
+  <meta name="description" content="LLVM函数的调用时声明插入
+如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。
+Constant  Module::getOrInsertFunction (    StringRef         Name,">
+<meta property="og:type" content="article">
 <meta property="og:title" content="西风广场">
-<meta property="og:url" content="http://sunxfancy.github.io/page/3/index.html">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/index.html">
 <meta property="og:site_name" content="西风广场">
-<meta property="og:description" content="横笛笑看今古事，立剑醉谈定江山">
+<meta property="og:description" content="LLVM函数的调用时声明插入
+如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。
+Constant  Module::getOrInsertFunction (    StringRef         Name,">
+<meta property="og:updated_time" content="2016-04-01T05:20:05.681Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="西风广场">
-<meta name="twitter:description" content="横笛笑看今古事，立剑醉谈定江山">
+<meta name="twitter:description" content="LLVM函数的调用时声明插入
+如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。
+Constant  Module::getOrInsertFunction (    StringRef         Name,">
   
     <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
   
@@ -184,9 +191,7 @@
 		</header>				
 	</div>
 </nav>
-      <div class="body-wrap">
-  
-    <article id="post-编译器架构的王者——LLVM/LLVM函数的调用时声明插入" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-编译器架构的王者——LLVM/LLVM函数的调用时声明插入" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
       <a href="/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/" class="article-date">
@@ -216,31 +221,66 @@
       
     </div>
     
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          C和C++的面向对象专题（9）——Gtkmm的最佳实践
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
 
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="编译器架构的王者——LLVM/LLVM函数的调用时声明插入" data-title="" data-url="http://sunxfancy.github.io/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
 
 
 
 
-
-  
-  
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
-    </nav>
-  
 </div>
       <footer id="footer">
   <div class="outer">
@@ -264,8 +304,8 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

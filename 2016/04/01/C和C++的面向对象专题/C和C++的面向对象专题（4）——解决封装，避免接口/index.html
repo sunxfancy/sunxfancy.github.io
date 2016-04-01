@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C和C++的面向对象专题（4）——解决封装，避免接口 | 西风广场</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+四、解决封装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C和C++的面向对象专题（4）——解决封装，避免接口">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/index.html">
+<meta property="og:site_name" content="西风广场">
+<meta property="og:description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+四、解决封装">
+<meta property="og:updated_time" content="2016-04-01T05:20:05.681Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C和C++的面向对象专题（4）——解决封装，避免接口">
+<meta name="twitter:description" content="本专栏文章列表
+一、何为面向对象
+二、C语言也能实现面向对象
+三、C++中的不优雅特性
+四、解决封装，避免接口
+五、合理使用模板，避免代码冗余
+六、C++也能反射
+七、单例模式解决静态成员对象和全局对象的构造顺序难题
+八、更为高级的预处理器PHP
+九、Gtkmm的最佳实践
+本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 http://sunxfancy.github.io/
+四、解决封装">
+  
+    <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">西风逍遥游</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/tags/随笔">随笔</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+					        
+								<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.vvliebe.com/">vvliebe的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">西风逍遥游，一只热爱生活的技术粉</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">西风逍遥游</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">西风逍遥游</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+			        
+						<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/" class="article-date">
+  	<time datetime="2016-04-01T05:20:05.681Z" itemprop="datePublished">2016-04-01</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      C和C++的面向对象专题（4）——解决封装，避免接口
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>本专栏文章列表</strong></p>
+<p>一、何为面向对象</p>
+<p>二、C语言也能实现面向对象</p>
+<p>三、C++中的不优雅特性</p>
+<p>四、解决封装，避免接口</p>
+<p>五、合理使用模板，避免代码冗余</p>
+<p>六、C++也能反射</p>
+<p>七、单例模式解决静态成员对象和全局对象的构造顺序难题</p>
+<p>八、更为高级的预处理器PHP</p>
+<p>九、Gtkmm的最佳实践</p>
+<p>本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 <a href="http://sunxfancy.github.io/">http://sunxfancy.github.io/</a></p>
+<h2 id="四、解决封装，避免接口"><a href="#四、解决封装，避免接口" class="headerlink" title="四、解决封装，避免接口"></a>四、解决封装，避免接口</h2><p>恩，今天我们来讨论，如何通过设计，解决C++中的不优雅特性，改进项目的结构，改善编译速度。</p>
+<p>上次我们提到，如果一个类的封装不好，容易导致种种不便，那么如何设计能够避免这种现象呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class test &#123;</span><br><span class="line">public:</span><br><span class="line">    void print() &#123;</span><br><span class="line">        printf(&quot;Hello\n&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void print2() &#123;</span><br><span class="line">        printf(&quot;K : %d\n&quot;, k);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    int k;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="简要的改进，将函数的实现移动到类cpp实现文件中"><a href="#简要的改进，将函数的实现移动到类cpp实现文件中" class="headerlink" title="简要的改进，将函数的实现移动到类cpp实现文件中"></a>简要的改进，将函数的实现移动到类cpp实现文件中</h3><p>最简单的想法就是将实现和声明分开，这也是C++提倡的，这样虽然文件会增多，但编译速度和代码的清晰度会提升。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/* test.h */</span><br><span class="line">class test &#123;</span><br><span class="line">public:</span><br><span class="line">    void print();</span><br><span class="line">    void print2();</span><br><span class="line">private:</span><br><span class="line">    int k;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/* test.cpp */</span><br><span class="line">#include &quot;test.h&quot;</span><br><span class="line">void test::print() &#123;</span><br><span class="line">    printf(&quot;Hello\n&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void test::print2() &#123;</span><br><span class="line">    printf(&quot;K : %d\n&quot;, k);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>很明显的，这样我们改动cpp文件中，.h文件不会受到影响，但假若我的private方法增加了，那么还是需要改动.h文件，进而会影响所有引用我的部分，为了避免这种情况出现，有什么好设计方法么？</p>
+<h3 id="使用接口降低代码耦合"><a href="#使用接口降低代码耦合" class="headerlink" title="使用接口降低代码耦合"></a>使用接口降低代码耦合</h3><p>一种标准的设计模式是使用接口，这在很多库的设计时也被经常采用，核心思想是通过多态调用的方式，避免内部方法的暴露。</p>
+<p>接口一般就是C++的多态类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/* Itest.h */</span><br><span class="line">class Itest &#123;</span><br><span class="line">public:</span><br><span class="line">    virtual void print() = 0;</span><br><span class="line">    virtual void print2() = 0;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">extern ITest* createItest(); // 类似工厂的方式为你构建类</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/* Itest.cpp */</span><br><span class="line">#include &quot;test.h&quot;</span><br><span class="line"></span><br><span class="line">ITest* createItest() &#123;</span><br><span class="line">    return new test();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>让test从这个接口继承出来：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/* test.h */</span><br><span class="line">class test : public Itest &#123;</span><br><span class="line">public:</span><br><span class="line">    virtual void print();</span><br><span class="line">    virtual void print2();</span><br><span class="line">private:</span><br><span class="line">    int k;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这样的好处当然十分明显了，将类转成接口的形式，就能方便的修改下面的实现类，无论实现类如何改动，都在模块范围内，接口不变。<br>但这样做的坏处也很明显，如果C++大量使用这样的方式实现内部封装，那么很多情况下效率比较低，而且代码复杂度就上来了，需要添加很多的接口类。</p>
+<h3 id="轻便的成员类封装"><a href="#轻便的成员类封装" class="headerlink" title="轻便的成员类封装"></a>轻便的成员类封装</h3><p>下面介绍一种简单的方式来实现类封装性的提升，首先还是看这个test类，我们将其提示为test2：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/* test2.h */</span><br><span class="line">class test2 &#123;</span><br><span class="line">public:</span><br><span class="line">    void print();</span><br><span class="line">    void print2();</span><br><span class="line">private:</span><br><span class="line">    int k;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这里的k实际上并不需要写在这里，我们需要的是将private的部分整体的封装成一个类：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">/* test2.h */</span><br><span class="line">class test2_private;</span><br><span class="line"></span><br><span class="line">class test2 &#123;</span><br><span class="line">public:</span><br><span class="line">    test2();</span><br><span class="line">    test2(int);</span><br><span class="line">    ~test2();</span><br><span class="line"></span><br><span class="line">    void print();</span><br><span class="line">    void print2();</span><br><span class="line"></span><br><span class="line">protected:</span><br><span class="line">    test2_private* that;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/* test2.cpp */</span><br><span class="line">#include &quot;test2.h&quot;</span><br><span class="line"></span><br><span class="line">class test2_private &#123;</span><br><span class="line">public:</span><br><span class="line">    int k;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">test2::test2() &#123;</span><br><span class="line">    that = new test2_private();</span><br><span class="line">    that-&gt;k = 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">test2::test2(int k) &#123;</span><br><span class="line">    that = new test2_private();</span><br><span class="line">    that-&gt;k = k;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">test2::~test2() &#123;</span><br><span class="line">    delete that;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时我们发现，这种封装可以很有效的解决类的接口不便的问题，而由于只使用了类指针，所以我们并不需要前向声明这个私有类，于是这个类可以方便的被修改，从而避免了接口和多态调用的问题。</p>
+<p>这种设计还有一个用途，假若你有另外的代码生成器生成的代码，需要和已有的类嵌入使用，那么推荐使用这种方式，Qt中就是这样做的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#ifndef MAINWINDOW_H</span><br><span class="line">#define MAINWINDOW_H</span><br><span class="line"></span><br><span class="line">#include &lt;QMainWindow&gt;</span><br><span class="line"></span><br><span class="line">namespace Ui &#123;</span><br><span class="line">class MainWindow;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class MainWindow : public QMainWindow</span><br><span class="line">&#123;</span><br><span class="line">    Q_OBJECT</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    explicit MainWindow(QWidget *parent = 0);</span><br><span class="line">    ~MainWindow();</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    Ui::MainWindow *ui;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">#endif // MAINWINDOW_H</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;mainwindow.h&quot;</span><br><span class="line">#include &quot;ui_mainwindow.h&quot;</span><br><span class="line"></span><br><span class="line">MainWindow::MainWindow(QWidget *parent) :</span><br><span class="line">    QMainWindow(parent),</span><br><span class="line">    ui(new Ui::MainWindow)</span><br><span class="line">&#123;</span><br><span class="line">    ui-&gt;setupUi(this);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">MainWindow::~MainWindow()</span><br><span class="line">&#123;</span><br><span class="line">    delete ui;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们发现这里有一个神奇的代码<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">namespace Ui &#123;</span><br><span class="line">class MainWindow;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其实这只是另外一个类，和本类并不同名，Ui::MainWindow是qt设计器帮忙生成的类，用来标注UI界面生成的一些代码，为了让代码很好的和我们自己的类统一起来，他们用了这种方式。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          C和C++的面向对象专题（3）——C++中的不优雅特性
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">C和C++的面向对象专题（5）——合理使用模板，避免代码冗余</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口" data-title="C和C++的面向对象专题（4）——解决封装，避免接口" data-url="http://sunxfancy.github.io/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 西风逍遥游
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>

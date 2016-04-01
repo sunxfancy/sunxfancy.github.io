@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   
-  <title>西风广场</title>
+  <title>Archives: 2016/4 | 西风广场</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="横笛笑看今古事，立剑醉谈定江山">
 <meta property="og:type" content="website">
 <meta property="og:title" content="西风广场">
-<meta property="og:url" content="http://sunxfancy.github.io/page/3/index.html">
+<meta property="og:url" content="http://sunxfancy.github.io/archives/2016/04/page/3/index.html">
 <meta property="og:site_name" content="西风广场">
 <meta property="og:description" content="横笛笑看今古事，立剑醉谈定江山">
 <meta name="twitter:card" content="summary">
@@ -186,61 +186,46 @@
 </nav>
       <div class="body-wrap">
   
-    <article id="post-编译器架构的王者——LLVM/LLVM函数的调用时声明插入" class="article article-type-post" itemscope itemprop="blogPost">
   
-    <div class="article-meta">
-      <a href="/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/" class="article-date">
-  	<time datetime="2016-04-01T05:20:05.681Z" itemprop="datePublished">2016-04-01</time>
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2016" class="archive-year">2016</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <div class="archive-article-inner">
+    <header class="archive-article-header">
+      	<div class="article-meta">
+	      	<a href="/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/" class="archive-article-date">
+  	<time datetime="2016-04-01T05:20:05.681Z" itemprop="datePublished">4月 1</time>
 </a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>LLVM函数的调用时声明插入</p>
-<p>如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。</p>
-<p>Constant <em> Module::getOrInsertFunction (<br>    StringRef         Name,<br>    FunctionType </em>     T,<br>    AttributeSet     AttributeList<br>)</p>
-<p>其行为是这样的：</p>
-<ol>
-<li>如果不存在，创建一个原型</li>
-<li>存在，但是一个static的局部函数，那么创建一个新的全局函数替换之</li>
-<li>存在，而且类型正确，返回当前函数</li>
-<li>存在，类型不匹配，那么会在外层包一个constantexpr cast的语句，转换到正确的类型上</li>
-</ol>
-<p>是不是很方便呢？<br>这样应该可以减少一次函数的声明遍历。</p>
+        </div>
+    	 
+        <div class="article-info info-on-right">
+          
+          
 
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
+        </div>
+        <div class="clearfix"></div>
+    </header>
   </div>
-  
 </article>
-
-
-
-
-
-
-
   
   
+    </div></section>
+  
+
+    
     <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+      <a class="extend prev" rel="prev" href="/archives/2016/04/page/2/">&laquo; Prev</a><a class="page-number" href="/archives/2016/04/">1</a><a class="page-number" href="/archives/2016/04/page/2/">2</a><span class="page-number current">3</span>
     </nav>
   
+
 </div>
       <footer id="footer">
   <div class="outer">
@@ -264,9 +249,9 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
+		isHome: false,
 		isPost: false,
-		isArchive: false,
+		isArchive: true,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true
