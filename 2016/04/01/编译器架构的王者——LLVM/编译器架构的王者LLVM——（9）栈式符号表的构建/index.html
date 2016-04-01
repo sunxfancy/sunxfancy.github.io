@@ -15,14 +15,14 @@
 <meta property="og:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
 版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
 栈式符号表的构建栈式符号表对于一款编译器，无疑是核心的组件。无论你在做什么符号扫描，那么都离不开符号表">
-<meta property="og:image" content="http://sunxfancy.github.io/img/9/fhb.png">
-<meta property="og:updated_time" content="2016-04-01T05:20:05.685Z">
+<meta property="og:image" content="http://sunxfancy.github.io/images/9/fhb.png">
+<meta property="og:updated_time" content="2016-04-01T05:44:19.787Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="编译器架构的王者LLVM——（9）栈式符号表的构建">
 <meta name="twitter:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
 版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
 栈式符号表的构建栈式符号表对于一款编译器，无疑是核心的组件。无论你在做什么符号扫描，那么都离不开符号表">
-<meta name="twitter:image" content="http://sunxfancy.github.io/img/9/fhb.png">
+<meta name="twitter:image" content="http://sunxfancy.github.io/images/9/fhb.png">
   
     <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
   
@@ -197,7 +197,7 @@
   
     <div class="article-meta">
       <a href="/2016/04/01/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/" class="article-date">
-  	<time datetime="2016-04-01T05:20:05.685Z" itemprop="datePublished">2016-04-01</time>
+  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
 </a>
     </div>
   
@@ -232,7 +232,7 @@
 <h2 id="源代码的例子"><a href="#源代码的例子" class="headerlink" title="源代码的例子"></a>源代码的例子</h2><p>首先我们来看一段C代码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">int a[3] = &#123; 100, 10, 1&#125;;</span><br><span class="line"></span><br><span class="line">int work() &#123;</span><br><span class="line">    if (a[0] == 100) &#123; // 这里的a指向的是全局符号a</span><br><span class="line">        int a = 99999; // 重新定义了局部符号    下图的符号表是扫描到这里后的情况</span><br><span class="line">        for (int i = 0; i&lt; 10; ++i) &#123;</span><br><span class="line">            a /= 3; // 由于局部符号优先级较高，引用局部符号</span><br><span class="line">        &#125;</span><br><span class="line">        return a; // 局部符号</span><br><span class="line">    &#125;</span><br><span class="line">    return a[0]; // 局部符号生命周期已过，找到全局符号</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>于是我们发现，符号表在局部声明变量后，将局部符号增加了，这和全局符号并不冲突，而是优先级不同，越靠近栈顶，越先发现</p>
-<p><img src="img/9/fhb.png" alt=""></p>
+<p><img src="/images/9/fhb.png" alt=""></p>
 <h2 id="用C-的map和stack构建符号表"><a href="#用C-的map和stack构建符号表" class="headerlink" title="用C++的map和stack构建符号表"></a>用C++的map和stack构建符号表</h2><p>如果考虑效率的话，最佳选择是用C语言构建符号表，这样操作起来会更快，但我们毕竟目前考虑开发的简便型而言，用C++的map就可以方便地实现符号表。</p>
 <p>首先我们做一个局部符号表，由于其中不会有重复的符号名，所以我们只要简单的将其存放起来即可。<br>然后符号表还需要记录很多类型信息、指针信息等，我们设计一个结构体表示它们：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">enum SymbolType</span><br><span class="line">&#123;</span><br><span class="line">    var_t, type_t, struct_t, enum_t, delegate_t, function_t</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct id &#123;</span><br><span class="line">    int        level;</span><br><span class="line">    SymbolType type;</span><br><span class="line">    void*      data;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
@@ -257,9 +257,18 @@
     
 <nav id="article-nav">
   
+    <a href="/2016/04/01/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          编译器架构的王者LLVM——（8）函数的调用及基本运算符
+        
+      </div>
+    </a>
   
-    <a href="/2016/04/01/编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">编译器架构的王者LLVM——（10）变量的存储与读取</div>
+  
+    <a href="/2016/04/01/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">编译器架构的王者LLVM——（2）开发LLVM项目</div>
       <strong class="article-nav-caption">></strong>
     </a>
   
