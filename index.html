@@ -114,7 +114,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						
+						<a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
 					</div>
 				</section>
 				
@@ -186,11 +186,11 @@
 </nav>
       <div class="body-wrap">
   
-    <article id="post-编译器架构的王者——LLVM/LLVM函数的调用时声明插入" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/" class="article-date">
+  	<time datetime="2016-04-17T22:18:16.000Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -199,28 +199,36 @@
       <input type="hidden" class="isFancy" />
     
     
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/">使用Sphinx翻译LLVM的中文文档</a>
+    </h1>
+  
+
+      </header>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>LLVM函数的调用时声明插入</p>
-<p>如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。</p>
-<p>Constant <em> Module::getOrInsertFunction (<br>    StringRef         Name,<br>    FunctionType </em>     T,<br>    AttributeSet     AttributeList<br>)</p>
-<p>其行为是这样的：</p>
-<ol>
-<li>如果不存在，创建一个原型</li>
-<li>存在，但是一个static的局部函数，那么创建一个新的全局函数替换之</li>
-<li>存在，而且类型正确，返回当前函数</li>
-<li>存在，类型不匹配，那么会在外层包一个constantexpr cast的语句，转换到正确的类型上</li>
-</ol>
-<p>是不是很方便呢？<br>这样应该可以减少一次函数的声明遍历。</p>
-
+        <p>Sphinx是一款非常方便的文档生成工具，以前就早有耳闻，最近计划将LLVM的文档翻译一些，在打开LLVM的文档源文件后发现，整个文档部分整理的非常整洁。下载的最新版LLVM-3.8版的源码，已经完全使用Sphinx生成文档，于是我也学习了一些Sphinx的相关用法。</p>
       
     </div>
     
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sphinx/">Sphinx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/中文文档/">中文文档</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
+	</div>
+
       
 
+      
+        <p class="article-more-link">
+          <a  href="/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/#more">more >></a>
+        </p>
       
       <div class="clearfix"></div>
     </div>
@@ -239,8 +247,8 @@
     <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/hello-world/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/hello-world/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -253,7 +261,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/hello-world/">Hello World</a>
+      <a class="article-title" href="/2016/04/17/hello-world/">Hello World</a>
     </h1>
   
 
@@ -298,8 +306,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（2）——C语言也能实现面向对象" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（2）——C语言也能实现面向对象/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（2）——C语言也能实现面向对象/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -312,7 +320,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（2）——C语言也能实现面向对象/">C和C++的面向对象专题（2）——C语言也能实现面向对象</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（2）——C语言也能实现面向对象/">C和C++的面向对象专题（2）——C语言也能实现面向对象</a>
     </h1>
   
 
@@ -338,7 +346,7 @@
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> test &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    test(<span class="keyword">char</span>* str, <span class="keyword">int</span> k) &#123;</span><br><span class="line">        <span class="keyword">this</span>-&gt;str = str;</span><br><span class="line">        <span class="keyword">this</span>-&gt;k = k;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ShowMessage</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; k; ++i)</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, str);	</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="keyword">int</span> k;</span><br><span class="line">    <span class="keyword">char</span>* str;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 <p>那么我们可以这样转换为一个C类</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* test.h */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _test &#123;</span><br><span class="line">    <span class="keyword">int</span> k;</span><br><span class="line">    <span class="keyword">char</span>* str;</span><br><span class="line">&#125; test;</span><br><span class="line"></span><br><span class="line"><span class="function">test* <span class="title">TestCreate</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowMessage</span><span class="params">(test*)</span></span>;</span><br></pre></td></tr></table></figure>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* test.c */</span></span><br><span class="line"></span><br><span class="line"><span class="function">test* <span class="title">TestCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (test*) <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(test));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowMessage</span><span class="params">(test* t)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; t-&gt;k; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, t-&gt;str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* test.c */</span></span><br><span class="line"></span><br><span class="line"><span class="function">test* <span class="title">TestCreate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    return (test*) <span class="built_in">malloc</span>(sizeof(test));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowMessage</span><span class="params">(test* t)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; t-&gt;k; ++i) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, t-&gt;str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>其实思路也很清晰，思路简单易懂，实现也很清新明快，在各类C工程中使用极为广泛。</p>
 <h3 id="复杂的基于GObject的面向对象程序设计"><a href="#复杂的基于GObject的面向对象程序设计" class="headerlink" title="复杂的基于GObject的面向对象程序设计"></a>复杂的基于GObject的面向对象程序设计</h3><p>如果你希望学习C语言的GUI程序设计，那么，必定要学习的就是GObject的类实现方式。<br>GObject相当于从C层面上模拟了一个C++的类对象模型，实现当然相对复杂的多。</p>
 <p>下面我们来实际看一下一个GTK的窗口类，这是GTK+-3.0的一段样例：</p>
@@ -374,8 +382,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -388,7 +396,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性/">C和C++的面向对象专题（3）——C++中的不优雅特性</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（3）——C++中的不优雅特性/">C和C++的面向对象专题（3）——C++中的不优雅特性</a>
     </h1>
   
 
@@ -453,8 +461,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -467,7 +475,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/">C和C++的面向对象专题（4）——解决封装，避免接口</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（4）——解决封装，避免接口/">C和C++的面向对象专题（4）——解决封装，避免接口</a>
     </h1>
   
 
@@ -537,8 +545,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -551,7 +559,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/">C和C++的面向对象专题（5）——合理使用模板，避免代码冗余</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（5）——合理使用模板，避免代码冗余/">C和C++的面向对象专题（5）——合理使用模板，避免代码冗余</a>
     </h1>
   
 
@@ -610,8 +618,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -624,7 +632,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射/">C和C++的面向对象专题（6）——C++也能反射</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（6）——C++也能反射/">C和C++的面向对象专题（6）——C++也能反射</a>
     </h1>
   
 
@@ -723,8 +731,8 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -737,7 +745,7 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题/">C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题/">C和C++的面向对象专题（7）——单例模式解决静态成员对象和全局对象的构造顺序难题</a>
     </h1>
   
 
@@ -796,8 +804,8 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -810,7 +818,7 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/">C和C++的面向对象专题（8）——更为高级的预处理器PHP</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/">C和C++的面向对象专题（8）——更为高级的预处理器PHP</a>
     </h1>
   
 
@@ -837,7 +845,7 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
 <p>test(A);<br>test(B);<br>test(C);<br>test(D);</p>
 <p>这对于宏来说，太困难了，为了能实现复杂的宏展开，我们希望用更高级的预处理器来实现该功能。</p>
 <p>我们这里使用PHP进行代码的预处理工作，将PHP代码当做C++的宏使用。<br>当然，你也可以用python做代码生成工作，但由于php是内嵌式的，处理起来可能更方便一些，当然，其他语言配上模板也是可以的。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* main.php */</span></span><br><span class="line">&lt;?php $return_m = <span class="string">"return a + b;"</span> ?&gt;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    &lt;?php echo $return_m; ?&gt; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; func(<span class="number">1</span>, <span class="number">2</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* main.php */</span></span><br><span class="line">&lt;?php $return_m = <span class="string">"return a + b;"</span> ?&gt;</span><br><span class="line"></span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    &lt;?php echo $return_m; ?&gt; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; func(<span class="number">1</span>, <span class="number">2</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    return <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>我们用如下指令生成C++代码：</p>
 <pre><code>php main.php &gt; main.cpp
 </code></pre><p>好的，下面就和正常的项目编译一样了，你甚至可以将php的命令写入到makefile中，自动化生成</p>
@@ -868,8 +876,8 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/" class="article-date">
-  	<time datetime="2016-04-01T05:44:19.787Z" itemprop="datePublished">2016-04-01</time>
+      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
 </a>
     </div>
   
@@ -882,7 +890,7 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/01/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/">C和C++的面向对象专题（9）——Gtkmm的最佳实践</a>
+      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/">C和C++的面向对象专题（9）——Gtkmm的最佳实践</a>
     </h1>
   
 
@@ -911,7 +919,7 @@ void* p = va_arg(ap, void*); 可以用来获得一个固定类型的参数
 <p>程序结构设计，按照一般程序架构设计，可以用MVC的结构，一个界面类，负责显示，一个控制类，负责游戏逻辑，一个模型类，负责数据的存储与管理。</p>
 <p>但由于数据的管理太过简单，就放弃了模型类，直接使用一个4×4的矩阵就完成任务。</p>
 <h3 id="程序实践"><a href="#程序实践" class="headerlink" title="程序实践"></a>程序实践</h3><p>由于Gtkmm的良好封装，我们并不需要太多复杂的处理，首先是Main文件引导程序的启动，所有gtk程序集合都是这样引导。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-05-07 12:22:40</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-05-20 21:58:16</span><br><span class="line">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtkmm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"game.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    Glib::RefPtr&lt;Gtk::Application&gt; app = Gtk::Application::create(argc, argv, <span class="string">"org.abs.gtk2048"</span>);</span><br><span class="line"></span><br><span class="line">    Game game;</span><br><span class="line">    <span class="comment">//Shows the window and returns when it is closed.</span></span><br><span class="line">    <span class="keyword">return</span> app-&gt;run(game);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-05-07 12:22:40</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-05-20 21:58:16</span><br><span class="line">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtkmm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"game.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    Glib::RefPtr&lt;Gtk::Application&gt; app = Gtk::Application::create(argc, argv, <span class="string">"org.abs.gtk2048"</span>);</span><br><span class="line"></span><br><span class="line">    Game game;</span><br><span class="line">    <span class="comment">//Shows the window and returns when it is closed.</span></span><br><span class="line">    return app-&gt;run(game);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>Game类作为最核心的窗口类，也是游戏的主要控制类，并不需要暴露什么方法给外部成员使用，所以它的定义很简单：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-05-19 11:20:42</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-05-20 21:58:35</span><br><span class="line">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> GAME_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GAME_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtkmm/window.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Game_private;</span><br><span class="line"><span class="keyword">class</span> Game : <span class="keyword">public</span> Gtk::Window</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Game();</span><br><span class="line">    <span class="keyword">virtual</span> ~Game();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Game_private* priv;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">// GAME_H</span></span></span><br></pre></td></tr></table></figure></p>
 <p>这种写法，就是在前几章提到的增强代码封装性的方法，通过一个priv指针，解决了C++封装不完善的问题。</p>
 <p>这样还有一个很大的好处就是，由于priv指针的书写较为繁琐，如果在public方法中，反复的通过priv指针调用函数，就会显得无比麻烦，但这正提醒你，你的写法有问题，因为一般的方法，要尽可能写成内部的private的，这样你在不自觉的时刻，就形成了最大化private方法，最小化接口的设计习惯，这对于提升程序的内聚性，很有意义。</p>

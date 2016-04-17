@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>编译器架构的王者LLVM——（2）开发LLVM项目 | 西风广场</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+开发LLVM项目介绍了LLVM这么多，那么我们能用LLVM做一款自己的编程语言么？答案是，有点难度，但不是不可行。只要你熟悉C++编程，而且有足够的热情，那么就没有什么能阻止你了。
+下面我就来介绍一下，LLVM项目的基本方法。需要的东西：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译器架构的王者LLVM——（2）开发LLVM项目">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/index.html">
+<meta property="og:site_name" content="西风广场">
+<meta property="og:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+开发LLVM项目介绍了LLVM这么多，那么我们能用LLVM做一款自己的编程语言么？答案是，有点难度，但不是不可行。只要你熟悉C++编程，而且有足够的热情，那么就没有什么能阻止你了。
+下面我就来介绍一下，LLVM项目的基本方法。需要的东西：">
+<meta property="og:updated_time" content="2016-04-17T15:05:27.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译器架构的王者LLVM——（2）开发LLVM项目">
+<meta name="twitter:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+开发LLVM项目介绍了LLVM这么多，那么我们能用LLVM做一款自己的编程语言么？答案是，有点难度，但不是不可行。只要你熟悉C++编程，而且有足够的热情，那么就没有什么能阻止你了。
+下面我就来介绍一下，LLVM项目的基本方法。需要的东西：">
+  
+    <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">西风逍遥游</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/tags/随笔">随笔</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+					        
+								<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.vvliebe.com/">vvliebe的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">西风逍遥游，一只热爱生活的技术粉</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">西风逍遥游</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">西风逍遥游</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+			        
+						<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/" class="article-date">
+  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      编译器架构的王者LLVM——（2）开发LLVM项目
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
+<h2 id="开发LLVM项目"><a href="#开发LLVM项目" class="headerlink" title="开发LLVM项目"></a>开发LLVM项目</h2><p>介绍了LLVM这么多，那么我们能用LLVM做一款自己的编程语言么？答案是，有点难度，但不是不可行。只要你熟悉C++编程，而且有足够的热情，那么就没有什么能阻止你了。</p>
+<p>下面我就来介绍一下，LLVM项目的基本方法。<br>需要的东西： LLVM平台库，文档，CMAKE，C++编译器</p>
+<h3 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h3><p>首先我的系统是Ubuntu14.04，我就介绍Ubuntu下的配置方法了，用Windows的朋友就不好意思了。<br>安装llvm-3.6及其开发包：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install llvm-3.6*</span><br></pre></td></tr></table></figure>
+<p>一般是推荐将文档和示例都下载下来的，因为比较这些对应版本的参考很重要，很多网上的代码，都是特定版本有效，后来就有API变更的情况。<br>所以大家一定注意版本问题，我开发的时候，源里面的版本最高就3.6，我也不追求什么最新版本，新特性什么的，所以声明一下，本系列教程的LLVM版本均为3.6版，文档参考也为3.6版。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install clang cmake</span><br></pre></td></tr></table></figure>
+<p>clang编译器，我个人感觉比gcc好用许多倍，而且这个编译器就是用llvm作为后端，能够帮助我们编译一些C代码到LLVM中间码，方便我们有个正确的中间码参考。</p>
+<h3 id="CMAKE管理项目"><a href="#CMAKE管理项目" class="headerlink" title="CMAKE管理项目"></a>CMAKE管理项目</h3><p>CMake作为C++项目管理的利器，也是非常好用的一个工具，这样我们就不用自己很烦的写Makefile了，</p>
+<p>下面是一个CMake示例，同时还带有FLex和Bison的配置：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.8</span>)</span><br><span class="line"><span class="keyword">project</span>(RedApple)</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(LLVM_TARGETS_TO_BUILD X86)</span><br><span class="line"><span class="keyword">set</span>(LLVM_BUILD_RUNTIME <span class="keyword">OFF</span>)</span><br><span class="line"><span class="keyword">set</span>(LLVM_BUILD_TOOLS <span class="keyword">OFF</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(LLVM REQUIRED CONFIG)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Found LLVM $&#123;LLVM_PACKAGE_VERSION&#125;"</span>)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Using LLVMConfig.cmake in: $&#123;LLVM_DIR&#125;"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(BISON)</span><br><span class="line"><span class="keyword">find_package</span>(FLEX)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_COMPILER_ENV_VAR <span class="string">"clang++"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS <span class="string">"-std=c++11"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_DEBUG   <span class="string">"-g"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_MINSIZEREL  <span class="string">"-Os -DNDEBUG"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_RELEASE  <span class="string">"-O4 -DNDEBUG"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_RELWITHDEBINFO <span class="string">"-O2 -g"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span>(EXECUTABLE_OUTPUT_PATH <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/bin)</span><br><span class="line"></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;LLVM_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;LLVM_DEFINITIONS&#125;</span>)</span><br><span class="line"></span><br><span class="line">FLEX_TARGET(MyScanner <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/redapple_lex.l</span><br><span class="line">                      <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>/redapple_lex.cpp COMPILE_FLAGS -w)</span><br><span class="line">BISON_TARGET(MyParser <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/redapple_parser.y</span><br><span class="line">                      <span class="variable">$&#123;CMAKE_CURRENT_BINARY_DIR&#125;</span>/redapple_parser.cpp)</span><br><span class="line">ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)</span><br><span class="line"></span><br><span class="line"><span class="keyword">include_directories</span>(Debug Release build <span class="keyword">include</span> src src/Model src/Utils)</span><br><span class="line"></span><br><span class="line">file(GLOB_RECURSE source_files  <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/*.cpp</span><br><span class="line">                                <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/Model/*.cpp</span><br><span class="line">                                <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/<span class="keyword">Macro</span>/*.cpp</span><br><span class="line">                                <span class="variable">$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;</span>/src/Utils/*.cpp)</span><br><span class="line"><span class="keyword">add_executable</span>(redapple <span class="variable">$&#123;source_files&#125;</span> </span><br><span class="line">                        <span class="variable">$&#123;BISON_MyParser_OUTPUTS&#125;</span> </span><br><span class="line">                        <span class="variable">$&#123;FLEX_MyScanner_OUTPUTS&#125;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">install</span>(TARGETS redapple RUNTIME DESTINATION bin)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find the libraries that correspond to the LLVM components</span></span><br><span class="line"><span class="comment"># that we wish to use</span></span><br><span class="line">llvm_map_components_to_libnames(llvm_libs </span><br><span class="line">    support core irreader executionengine interpreter </span><br><span class="line">    mc mcjit bitwriter x86codegen target)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Link against LLVM libraries</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(redapple <span class="variable">$&#123;llvm_libs&#125;</span>)</span><br></pre></td></tr></table></figure>
+<p>Ubuntu的默认安装，有时LLVM会出bug，cmake找不到许多配置文件，我仔细查看了它的CMake配置，发现有一行脚本路径写错了：<br>/usr/share/llvm-3.6/cmake/ 是llvm的cmake配置路径</p>
+<p>其中的LLVMConfig.cmake第48行，它原来的路径是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set(LLVM_CMAKE_DIR &quot;/usr/share/llvm-3.6/share/llvm/cmake&quot;)</span><br></pre></td></tr></table></figure>
+<p>应该改成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set(LLVM_CMAKE_DIR &quot;/usr/share/llvm-3.6/cmake&quot;)</span><br></pre></td></tr></table></figure>
+<p>Ubuntu下的llvm文档和示例都在如下目录：<br>/usr/share/doc/llvm-3.6-doc<br>/usr/share/doc/llvm-3.6-examples</p>
+<p>我们将example下的HowToUseJIT复制到工作目录中，测试编译一下，懒得找的可以粘我后面附录给的内容。<br>然后再用简单修改后的CMake测试编译一下。</p>
+<p>项目结构是这样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HowToUseJIT -- src</span><br><span class="line">                + --- HowToUseJIT.cpp</span><br><span class="line">        +  --- CMakeLists.txt</span><br><span class="line">        +  --- build</span><br></pre></td></tr></table></figure></p>
+<p>在项目根目录执行如下指令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cd build</span><br><span class="line">cmake ..</span><br><span class="line">make</span><br></pre></td></tr></table></figure></p>
+<p>如果编译通过了，那么恭喜你，你已经会构建LLVM项目了</p>
+<h3 id="附：-CMakeLists-txt-和-HowToUseJIT-cpp"><a href="#附：-CMakeLists-txt-和-HowToUseJIT-cpp" class="headerlink" title="附： CMakeLists.txt 和 HowToUseJIT.cpp"></a>附： CMakeLists.txt 和 HowToUseJIT.cpp</h3><p>CMakeLists.txt<br><figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">cmake_minimum_required</span>(VERSION <span class="number">2.8</span>)</span><br><span class="line"><span class="keyword">project</span>(llvm_test)</span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span>(LLVM_TARGETS_TO_BUILD X86)</span><br><span class="line"><span class="keyword">set</span>(LLVM_BUILD_RUNTIME <span class="keyword">OFF</span>)</span><br><span class="line"><span class="keyword">set</span>(LLVM_BUILD_TOOLS <span class="keyword">OFF</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">find_package</span>(LLVM REQUIRED CONFIG)</span><br><span class="line"></span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Found LLVM $&#123;LLVM_PACKAGE_VERSION&#125;"</span>)</span><br><span class="line"><span class="keyword">message</span>(STATUS <span class="string">"Using LLVMConfig.cmake in: $&#123;LLVM_DIR&#125;"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_COMPILER_ENV_VAR <span class="string">"clang++"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS <span class="string">"-std=c++11"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_DEBUG   <span class="string">"-g"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_MINSIZEREL  <span class="string">"-Os -DNDEBUG"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_RELEASE  <span class="string">"-O4 -DNDEBUG"</span>)</span><br><span class="line"><span class="keyword">SET</span> (CMAKE_CXX_FLAGS_RELWITHDEBINFO <span class="string">"-O2 -g"</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span>(EXECUTABLE_OUTPUT_PATH <span class="variable">$&#123;PROJECT_SOURCE_DIR&#125;</span>/bin)</span><br><span class="line"></span><br><span class="line"><span class="keyword">include_directories</span>(<span class="variable">$&#123;LLVM_INCLUDE_DIRS&#125;</span>)</span><br><span class="line"><span class="keyword">add_definitions</span>(<span class="variable">$&#123;LLVM_DEFINITIONS&#125;</span>)</span><br><span class="line"></span><br><span class="line">file(GLOB_RECURSE source_files <span class="string">"$&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/src/*.cpp"</span>)</span><br><span class="line"><span class="keyword">add_executable</span>(llvm_test <span class="variable">$&#123;source_files&#125;</span>)</span><br><span class="line"><span class="keyword">install</span>(TARGETS llvm_test RUNTIME DESTINATION bin)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Find the libraries that correspond to the LLVM components</span></span><br><span class="line"><span class="comment"># that we wish to use</span></span><br><span class="line">llvm_map_components_to_libnames(llvm_libs </span><br><span class="line">    Core</span><br><span class="line">    ExecutionEngine</span><br><span class="line">    Interpreter</span><br><span class="line">    MC</span><br><span class="line">    Support</span><br><span class="line">    nativecodegen)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Link against LLVM libraries</span></span><br><span class="line"><span class="keyword">target_link_libraries</span>(llvm_test <span class="variable">$&#123;llvm_libs&#125;</span>)</span><br></pre></td></tr></table></figure></p>
+<p>HowToUseJIT.cpp<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//===-- examples/HowToUseJIT/HowToUseJIT.cpp - An example use of the JIT --===//</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//                     The LLVM Compiler Infrastructure</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// This file is distributed under the University of Illinois Open Source</span></span><br><span class="line"><span class="comment">// License. See LICENSE.TXT for details.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//===----------------------------------------------------------------------===//</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//  This small program provides an example of how to quickly build a small</span></span><br><span class="line"><span class="comment">//  module with two functions and execute it with the JIT.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Goal:</span></span><br><span class="line"><span class="comment">//  The goal of this snippet is to create in the memory</span></span><br><span class="line"><span class="comment">//  the LLVM module consisting of two functions as follow: </span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// int add1(int x) &#123;</span></span><br><span class="line"><span class="comment">//   return x+1;</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// int foo() &#123;</span></span><br><span class="line"><span class="comment">//   return add1(10);</span></span><br><span class="line"><span class="comment">// &#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// then compile the module via JIT, then execute the `foo'</span></span><br><span class="line"><span class="comment">// function and return result to a driver, i.e. to a "host program".</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Some remarks and questions:</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// - could we invoke some code using noname functions too?</span></span><br><span class="line"><span class="comment">//   e.g. evaluate "foo()+foo()" without fears to introduce</span></span><br><span class="line"><span class="comment">//   conflict of temporary function name with some real</span></span><br><span class="line"><span class="comment">//   existing function name?</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//===----------------------------------------------------------------------===//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/ExecutionEngine/GenericValue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/ExecutionEngine/Interpreter.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/Constants.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/DerivedTypes.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/IRBuilder.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/Instructions.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/LLVMContext.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/IR/Module.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/Support/ManagedStatic.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/Support/TargetSelect.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"llvm/Support/raw_ostream.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> llvm;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">  InitializeNativeTarget();</span><br><span class="line"></span><br><span class="line">  LLVMContext Context;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// Create some module to put our function into it.</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">unique_ptr</span>&lt;Module&gt; Owner = make_unique&lt;Module&gt;(<span class="string">"test"</span>, Context);</span><br><span class="line">  Module *M = Owner.get();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create the add1 function entry and insert this entry into module M.  The</span></span><br><span class="line">  <span class="comment">// function will have a return type of "int" and take an argument of "int".</span></span><br><span class="line">  <span class="comment">// The '0' terminates the list of argument types.</span></span><br><span class="line">  Function *Add1F =</span><br><span class="line">    cast&lt;Function&gt;(M-&gt;getOrInsertFunction(<span class="string">"add1"</span>, Type::getInt32Ty(Context),</span><br><span class="line">                                          Type::getInt32Ty(Context),</span><br><span class="line">                                          (Type *)<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Add a basic block to the function. As before, it automatically inserts</span></span><br><span class="line">  <span class="comment">// because of the last argument.</span></span><br><span class="line">  BasicBlock *BB = BasicBlock::Create(Context, <span class="string">"EntryBlock"</span>, Add1F);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create a basic block builder with default parameters.  The builder will</span></span><br><span class="line">  <span class="comment">// automatically append instructions to the basic block `BB'.</span></span><br><span class="line">  IRBuilder&lt;&gt; builder(BB);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Get pointers to the constant `1'.</span></span><br><span class="line">  Value *One = builder.getInt32(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Get pointers to the integer argument of the add1 function...</span></span><br><span class="line">  assert(Add1F-&gt;arg_begin() != Add1F-&gt;arg_end()); <span class="comment">// Make sure there's an arg</span></span><br><span class="line">  Argument *ArgX = Add1F-&gt;arg_begin();  <span class="comment">// Get the arg</span></span><br><span class="line">  ArgX-&gt;setName(<span class="string">"AnArg"</span>);            <span class="comment">// Give it a nice symbolic name for fun.</span></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create the add instruction, inserting it into the end of BB.</span></span><br><span class="line">  Value *Add = builder.CreateAdd(One, ArgX);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create the return instruction and add it to the basic block</span></span><br><span class="line">  builder.CreateRet(Add);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Now, function add1 is ready.</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">// Now we're going to create function `foo', which returns an int and takes no</span></span><br><span class="line">  <span class="comment">// arguments.</span></span><br><span class="line">  Function *FooF =</span><br><span class="line">    cast&lt;Function&gt;(M-&gt;getOrInsertFunction(<span class="string">"foo"</span>, Type::getInt32Ty(Context),</span><br><span class="line">                                          (Type *)<span class="number">0</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Add a basic block to the FooF function.</span></span><br><span class="line">  BB = BasicBlock::Create(Context, <span class="string">"EntryBlock"</span>, FooF);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Tell the basic block builder to attach itself to the new basic block</span></span><br><span class="line">  builder.SetInsertPoint(BB);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Get pointer to the constant `10'.</span></span><br><span class="line">  Value *Ten = builder.getInt32(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Pass Ten to the call to Add1F</span></span><br><span class="line">  CallInst *Add1CallRes = builder.CreateCall(Add1F, Ten);</span><br><span class="line">  Add1CallRes-&gt;setTailCall(<span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Create the return instruction and add it to the basic block.</span></span><br><span class="line">  builder.CreateRet(Add1CallRes);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Now we create the JIT.</span></span><br><span class="line">  ExecutionEngine* EE = EngineBuilder(std::move(Owner)).create();</span><br><span class="line"></span><br><span class="line">  outs() &lt;&lt; <span class="string">"We just constructed this LLVM module:\n\n"</span> &lt;&lt; *M;</span><br><span class="line">  outs() &lt;&lt; <span class="string">"\n\nRunning foo: "</span>;</span><br><span class="line">  outs().flush();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Call the `foo' function with no arguments:</span></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;GenericValue&gt; noargs;</span><br><span class="line">  GenericValue gv = EE-&gt;runFunction(FooF, noargs);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Import result of execution:</span></span><br><span class="line">  outs() &lt;&lt; <span class="string">"Result: "</span> &lt;&lt; gv.IntVal &lt;&lt; <span class="string">"\n"</span>;</span><br><span class="line">  <span class="keyword">delete</span> EE;</span><br><span class="line">  llvm_shutdown();</span><br><span class="line">  return <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          编译器架构的王者LLVM——（1）现代编译器架构
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">编译器架构的王者LLVM——（3）用代码生成代码</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目" data-title="编译器架构的王者LLVM——（2）开发LLVM项目" data-url="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 西风逍遥游
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>

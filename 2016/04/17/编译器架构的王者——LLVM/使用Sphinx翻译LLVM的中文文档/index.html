@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用Sphinx翻译LLVM的中文文档 | 西风广场</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Sphinx是一款非常方便的文档生成工具，以前就早有耳闻，最近计划将LLVM的文档翻译一些，在打开LLVM的文档源文件后发现，整个文档部分整理的非常整洁。下载的最新版LLVM-3.8版的源码，已经完全使用Sphinx生成文档，于是我也学习了一些Sphinx的相关用法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Sphinx翻译LLVM的中文文档">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/index.html">
+<meta property="og:site_name" content="西风广场">
+<meta property="og:description" content="Sphinx是一款非常方便的文档生成工具，以前就早有耳闻，最近计划将LLVM的文档翻译一些，在打开LLVM的文档源文件后发现，整个文档部分整理的非常整洁。下载的最新版LLVM-3.8版的源码，已经完全使用Sphinx生成文档，于是我也学习了一些Sphinx的相关用法。">
+<meta property="og:image" content="http://www.sphinx-doc.org/en/stable/_images/translation.png">
+<meta property="og:updated_time" content="2016-04-17T15:05:27.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Sphinx翻译LLVM的中文文档">
+<meta name="twitter:description" content="Sphinx是一款非常方便的文档生成工具，以前就早有耳闻，最近计划将LLVM的文档翻译一些，在打开LLVM的文档源文件后发现，整个文档部分整理的非常整洁。下载的最新版LLVM-3.8版的源码，已经完全使用Sphinx生成文档，于是我也学习了一些Sphinx的相关用法。">
+<meta name="twitter:image" content="http://www.sphinx-doc.org/en/stable/_images/translation.png">
+  
+    <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">西风逍遥游</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/tags/随笔">随笔</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+					        
+								<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.vvliebe.com/">vvliebe的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">西风逍遥游，一只热爱生活的技术粉</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">西风逍遥游</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">西风逍遥游</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+			        
+						<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/" class="article-date">
+  	<time datetime="2016-04-17T22:18:16.000Z" itemprop="datePublished">2016-04-17</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用Sphinx翻译LLVM的中文文档
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/LLVM/">LLVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Sphinx/">Sphinx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/中文文档/">中文文档</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/随笔/">随笔</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Sphinx是一款非常方便的文档生成工具，以前就早有耳闻，最近计划将LLVM的文档翻译一些，在打开LLVM的文档源文件后发现，整个文档部分整理的非常整洁。下载的最新版LLVM-3.8版的源码，已经完全使用Sphinx生成文档，于是我也学习了一些Sphinx的相关用法。</p>
+<a id="more"></a>
+<p>Sphinx是python编写的一款命令行工具，在python3或python2下都能正常的工作，安装可以使用流行的pip进行安装：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ pip install sphinx --upgrade</span><br><span class="line">$ pip install sphinx-intl</span><br></pre></td></tr></table></figure>
+<p>Sphinx的依赖项比较新，最好还是更新一下比较好。<code>sphinx-intl</code>是一个命令行工具，用来实现多语言翻译的。</p>
+<p>Sphinx有着非常独特且方便的代码翻译模型，可以用工具将英语版编写的文档中的文字全部抽取出来，在<code>.po</code>文件下，可以让用户方便地进行修改和翻译。最后根据生成时的语言配置，构建对应语言版本的文档。</p>
+<p><img src="http://www.sphinx-doc.org/en/stable/_images/translation.png" alt="sphinx i18n model"></p>
+<p>不过我们先不管Sphinx是如何进行翻译抽取的，先来看下LLVM文档的构建。</p>
+<h2 id="基本HTML文档的构建"><a href="#基本HTML文档的构建" class="headerlink" title="基本HTML文档的构建"></a>基本HTML文档的构建</h2><p>默认LLVM的docs目录下的makefile是给doxygen使用的，这里我将<code>Makefile.sphinx</code>改成默认的makefile。这样接下来的命令中，都不会再出现对于原版<code>-f Makefile.sphinx</code>参数了。</p>
+<p>首先对于构建html版本，非常简单，直接make默认参数即可，或者<code>make html</code>都可以。</p>
+<p>这样，会在<code>_build</code>目录下生成对应的网站文件夹。</p>
+<p>这样构建的文档，是可以作为静态网站直接发布出去的，不过发布到github上的gitpages上还是会有点问题，我们这里先不谈，接下来的发布注意中再细说。</p>
+<h2 id="抽取文档中的文本并开始翻译"><a href="#抽取文档中的文本并开始翻译" class="headerlink" title="抽取文档中的文本并开始翻译"></a>抽取文档中的文本并开始翻译</h2><p>我们的目标是翻译，将英文文档尽可能正确无误地转换为中文文档。这里我们使用<code>sphinx-intl</code>工具进行翻译。</p>
+<ol>
+<li><p>首先配置<code>conf.py</code>文件<br> <code>conf.py</code>是sphinx的配置文件，我们需要为其增加国际化翻译文件夹：</p>
+ <figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">language = <span class="string">'zh_CN'</span> <span class="comment"># language supported</span></span><br><span class="line">locale_dirs = [<span class="string">'locale/'</span>]   <span class="comment"># path is example but recommended.</span></span><br><span class="line">gettext_compact = <span class="keyword">False</span>     <span class="comment"># optional.</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>抽取需要转换的文本到pot文件列表中<br> 执行如下指令即可：</p>
+ <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ make gettext</span><br></pre></td></tr></table></figure>
+<p> 这时，会在<code>_build</code>目录出现一个<code>locale</code>文件夹，是抽取出的全部文本段。</p>
+</li>
+<li><p>更新对应语言的版本</p>
+ <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sphinx-intl update -p _build/locale <span class="_">-l</span> zh_CN</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>手动翻译抽取后的文段<br> 这时，我们将可以在<code>locale</code>目录，注意，是文档项目根目录下的<code>locale</code>，这才是我们要翻译文本的<code>.po</code>文件夹。里面内容大概如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#: ../../builders.rst:4</span><br><span class="line">msgid &quot;Available builders&quot;</span><br><span class="line">msgstr &quot;&lt;一些你要翻译的汉语&gt;&quot;</span><br></pre></td></tr></table></figure>
+<p> msgid和msgstr一对一句，是全部抽取出来的文本的翻译，只要你对应翻译，注意rst文件的格式，翻译出来很少会出问题，样式完全一致，而且链接不会错乱。</p>
+</li>
+<li><p>构建新版文档<br> 由于我们在<code>conf.py</code>下配置了默认的language，所以只要这时再重新make，项目文档就生成成中文版的了。</p>
+</li>
+</ol>
+<h2 id="看下效果"><a href="#看下效果" class="headerlink" title="看下效果"></a>看下效果</h2><p>今天一下午研究sphinx+晚上翻译，将LLVM官网首页翻译了个大概，有兴趣的朋友可以看下我发布到gitpages上的中文文档：</p>
+<p><a href="http://sunxfancy.github.io/llvm-cn/">http://sunxfancy.github.io/llvm-cn/</a></p>
+<p>另外英语好且正在使用LLVM的朋友，欢迎一同和我来翻译这个项目，给更多人带来便利。</p>
+<h2 id="发布项目的小问题"><a href="#发布项目的小问题" class="headerlink" title="发布项目的小问题"></a>发布项目的小问题</h2><p>之前我们提到，发布到gitpages出些问题，所有<code>_static</code>等带<code>_</code>前缀的文件夹无法访问，思考了一下，觉得是github本身的问题，在看sphinx文档的时候，发现提到了一个文件，必须同时发布到gitpages上。</p>
+<p><code>.nojekyll</code>,这个空的小文件十分重要，因为它直接关系着github上的解析规则，加上这个空文件，gitpages就会停止默认的过滤规则，运行我们的资源文件的访问。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2016/04/17/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello World</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档" data-title="使用Sphinx翻译LLVM的中文文档" data-url="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/使用Sphinx翻译LLVM的中文文档/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 西风逍遥游
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>

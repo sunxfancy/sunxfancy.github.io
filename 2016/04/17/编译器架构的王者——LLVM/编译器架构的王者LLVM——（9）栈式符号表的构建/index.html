@@ -3,17 +3,26 @@
 <head>
   <meta charset="utf-8">
   
-  <title>西风广场</title>
+  <title>编译器架构的王者LLVM——（9）栈式符号表的构建 | 西风广场</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="横笛笑看今古事，立剑醉谈定江山">
-<meta property="og:type" content="website">
-<meta property="og:title" content="西风广场">
-<meta property="og:url" content="http://sunxfancy.github.io/page/3/index.html">
+  <meta name="description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+栈式符号表的构建栈式符号表对于一款编译器，无疑是核心的组件。无论你在做什么符号扫描，那么都离不开符号表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译器架构的王者LLVM——（9）栈式符号表的构建">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/index.html">
 <meta property="og:site_name" content="西风广场">
-<meta property="og:description" content="横笛笑看今古事，立剑醉谈定江山">
+<meta property="og:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+栈式符号表的构建栈式符号表对于一款编译器，无疑是核心的组件。无论你在做什么符号扫描，那么都离不开符号表">
+<meta property="og:image" content="http://sunxfancy.github.io/images/9/fhb.png">
+<meta property="og:updated_time" content="2016-04-17T15:05:27.631Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="西风广场">
-<meta name="twitter:description" content="横笛笑看今古事，立剑醉谈定江山">
+<meta name="twitter:title" content="编译器架构的王者LLVM——（9）栈式符号表的构建">
+<meta name="twitter:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+栈式符号表的构建栈式符号表对于一款编译器，无疑是核心的组件。无论你在做什么符号扫描，那么都离不开符号表">
+<meta name="twitter:image" content="http://sunxfancy.github.io/images/9/fhb.png">
   
     <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
   
@@ -184,89 +193,7 @@
 		</header>				
 	</div>
 </nav>
-      <div class="body-wrap">
-  
-    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/">编译器架构的王者LLVM——（8）函数的调用及基本运算符</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
-<p>版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 <a href="http://blog.csdn.net/xfxyy_sxfancy" target="_blank" rel="external">http://blog.csdn.net/xfxyy_sxfancy</a></p>
-<h1 id="函数的调用及基本运算符"><a href="#函数的调用及基本运算符" class="headerlink" title="函数的调用及基本运算符"></a>函数的调用及基本运算符</h1><p>之前我们提到了函数的定义，那么，定义好的函数如何调用才行呢？今天我们就来了解一下，函数的调用。</p>
-<h2 id="函数调用的宏形式"><a href="#函数调用的宏形式" class="headerlink" title="函数调用的宏形式"></a>函数调用的宏形式</h2><p>我们去读之前对函数调用的语法树翻译形式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;%d\n&quot;, y);</span><br></pre></td></tr></table></figure>
-<p>会被翻译为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Node</span><br><span class="line">             String call</span><br><span class="line">             String printf</span><br><span class="line">             String %d\n</span><br><span class="line">             ID y</span><br></pre></td></tr></table></figure>
-<p>这个宏的名字是call，是个不定参数的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(call 函数名 参数表... )</span><br></pre></td></tr></table></figure></p>
-<p>于是我们就需要扫描参数表，获取全部调用参数。</p>
-<h2 id="调用宏的基本形式"><a href="#调用宏的基本形式" class="headerlink" title="调用宏的基本形式"></a>调用宏的基本形式</h2><p>调用宏其实很简单，就是不断循环判断有多少参数即可。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static Value* call_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 参数一 函数名</span><br><span class="line">    </span><br><span class="line">    // 其余参数 要传入的参数</span><br><span class="line">    for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">        // 循环获取参数</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>另外我们查阅一下LLVM的文档，找到其中CallInst这个指令，LLVM的指令都派生自Instruction，可以发现构建的方法很简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static CallInst * Create (Value *Func, ArrayRef&lt; Value * &gt; Args, const Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span><br></pre></td></tr></table></figure></p>
-<p>但是我们发现，Value中要传输的是一个Function对象，如何获取呢？当然还是从符号表中获取，我们下次会讲符号表的实现，这次也和上节一样，将接口先写出来。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 参数一 函数名</span><br><span class="line">Value* func = context-&gt;getFunction(node);</span><br><span class="line">if (func == NULL) &#123;</span><br><span class="line">    errs() &lt;&lt; &quot;找不到函数的定义：&quot;;</span><br><span class="line">    errs() &lt;&lt; node-&gt;getStr().c_str() &lt;&lt; &quot;\n&quot;;</span><br><span class="line">    exit(1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>函数调用在生成时，如果这个函数还没有被扫描到，那么在生成时会报函数定义找不到的问题，这就是我们为什么要用多遍扫描。只有充分的多次扫描语法树，才能获取每个函数后面的函数定义。虽然像C语言那样强制声明也可以，但我个人不大喜欢这种风格。</p>
-<p>至于参数的获取，就十分简单的，但有一点要注意，参数是递归生成的，例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;%d&quot;, add(3, 5));</span><br></pre></td></tr></table></figure>
-<p>这时，我们在获取参数时，就会发现，其中一个参数是表达式，那么我们就要先对其进行处理：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 其余参数 要传入的参数</span><br><span class="line">std::vector&lt;Value*&gt; args;</span><br><span class="line">for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">    Value* v = p-&gt;codeGen(context); // 递归地生成参数</span><br><span class="line">    if (v != NULL)</span><br><span class="line">        args.push_back(v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>Node类下面有实现codeGen方法，其作用就是重新调用了完整的对当前节点的代码生成，方便递归调用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Value* Node::codeGen(CodeGenContext* context) &#123;</span><br><span class="line">    return context-&gt;MacroMake(this); // MacroMake是核心的代码生成接口</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>于是我们递归地生成了这些代码，就可以产生一条Call语句，那么别忘记将其返回给上一层：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static Value* call_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 参数一 函数名</span><br><span class="line">    Value* func = context-&gt;getFunction(node);</span><br><span class="line">    if (func == NULL) &#123;</span><br><span class="line">        errs() &lt;&lt; &quot;找不到函数的定义：&quot;;</span><br><span class="line">        errs() &lt;&lt; node-&gt;getStr().c_str() &lt;&lt; &quot;\n&quot;;</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 其余参数 要传入的参数</span><br><span class="line">    std::vector&lt;Value*&gt; args;</span><br><span class="line">    for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">        Value* v = p-&gt;codeGen(context);</span><br><span class="line">        if (v != NULL)</span><br><span class="line">            args.push_back(v);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CallInst *call = CallInst::Create(func, args, &quot;&quot;, context-&gt;getNowBlock());</span><br><span class="line">    return call;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="简单运算符计算"><a href="#简单运算符计算" class="headerlink" title="简单运算符计算"></a>简单运算符计算</h2><p>对于计算机，加减乘除这些基本运算，就是几个指令而已，但对于编译器，却也要分好几种情况讨论，因为，全部的运算符有这么多：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// Standard binary operators...</span><br><span class="line"> FIRST_BINARY_INST( 8)</span><br><span class="line">HANDLE_BINARY_INST( 8, Add  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST( 9, FAdd , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(10, Sub  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(11, FSub , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(12, Mul  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(13, FMul , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(14, UDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(15, SDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(16, FDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(17, URem , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(18, SRem , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(19, FRem , BinaryOperator)</span><br><span class="line"></span><br><span class="line">// Logical operators (integer operands)</span><br><span class="line">HANDLE_BINARY_INST(20, Shl  , BinaryOperator) // Shift left  (logical)</span><br><span class="line">HANDLE_BINARY_INST(21, LShr , BinaryOperator) // Shift right (logical)</span><br><span class="line">HANDLE_BINARY_INST(22, AShr , BinaryOperator) // Shift right (arithmetic)</span><br><span class="line">HANDLE_BINARY_INST(23, And  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(24, Or   , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(25, Xor  , BinaryOperator)</span><br></pre></td></tr></table></figure></p>
-<p>这些定义很难找，在文档中并没有真正写出来，而是在头文件的<code>llvm/IR/Instruction.def</code>里面，这是宏定义的专属部分。<br>这些还仅仅是数值运算，还不算比较运算的部分呢。</p>
-<p>当然，这和计算机体系结构有关，浮点数的运算和整数肯定是不一样的，而我们知道，右移位也分算数右移和逻辑右移。所以必然，会有大量不同的运算符。</p>
-<p>创建指令则很简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static BinaryOperator * Create (BinaryOps Op, Value *S1, Value *S2, const Twine &amp;Name, BasicBlock *InsertAtEnd)</span><br></pre></td></tr></table></figure></p>
-<p>两个运算数，可以是常量，也可以是变量load出值后，还可以是表达式返回值，只要两个Value调用getType，符合运算规则，就可以。<br>注意，浮点数不能直接和整数运算，必须先将整形转为浮点才可以。</p>
-<p>于是以下是简单的运算符操作，我只写了整数的运算操作：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static Value* opt2_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    std::string opt = node-&gt;getStr();</span><br><span class="line"></span><br><span class="line">    Node* op1 = (node = node-&gt;getNext());</span><br><span class="line">    if (node == NULL) return NULL;</span><br><span class="line">    Node* op2 = (node = node-&gt;getNext());</span><br><span class="line">    if (node == NULL) return NULL;</span><br><span class="line"></span><br><span class="line">    Instruction::BinaryOps instr;</span><br><span class="line">    if (opt == &quot;+&quot;) &#123; instr = Instruction::Add;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;-&quot;) &#123; instr = Instruction::Sub;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;*&quot;) &#123; instr = Instruction::Mul;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;/&quot;) &#123; instr = Instruction::SDiv; goto binOper; &#125;</span><br><span class="line"></span><br><span class="line">    // 未知运算符</span><br><span class="line">    return NULL;</span><br><span class="line"></span><br><span class="line">binOper:</span><br><span class="line">    return BinaryOperator::Create(instr, op1-&gt;codeGen(context), </span><br><span class="line">        op2-&gt;codeGen(context), &quot;&quot;, context-&gt;getNowBlock());</span><br></pre></td></tr></table></figure>
-<h2 id="附：文档参考及源代码"><a href="#附：文档参考及源代码" class="headerlink" title="附：文档参考及源代码"></a>附：文档参考及源代码</h2><p><a href="http://llvm.org/doxygen/classllvm_1_1CallInst.html" target="_blank" rel="external">CallInst类参考</a><br><a href="http://llvm.org/doxygen/classllvm_1_1BinaryOperator.html" target="_blank" rel="external">BinaryOperator类参考</a><br><a href="https://github.com/sunxfancy/RedApple/blob/master/src/Macro/Functions.cpp" target="_blank" rel="external">github源码-函数调用及基本运算符</a></p>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
-    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建" class="article article-type-post" itemscope itemprop="blogPost">
+      <div class="body-wrap"><article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
       <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/" class="article-date">
@@ -282,12 +209,19 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/">编译器架构的王者LLVM——（9）栈式符号表的构建</a>
+    <h1 class="article-title" itemprop="name">
+      编译器架构的王者LLVM——（9）栈式符号表的构建
     </h1>
   
 
       </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
       
     
     <div class="article-entry" itemprop="articleBody">
@@ -318,31 +252,66 @@
       
     </div>
     
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          编译器架构的王者LLVM——（8）函数的调用及基本运算符
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
 
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建" data-title="编译器架构的王者LLVM——（9）栈式符号表的构建" data-url="http://sunxfancy.github.io/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
 
 
 
 
-
-  
-  
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/page/2/">&laquo; Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
-    </nav>
-  
 </div>
       <footer id="footer">
   <div class="outer">
@@ -366,8 +335,8 @@
 		fancybox: true,
 		mathjax: true,
 		animate: true,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,
