@@ -114,7 +114,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+						<a href="/tags/16-04/" style="font-size: 10px;">16.04</a> <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/Ubuntu/" style="font-size: 10px;">Ubuntu</a> <a href="/tags/Xenial/" style="font-size: 10px;">Xenial</a> <a href="/tags/Xerus/" style="font-size: 10px;">Xerus</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/发布/" style="font-size: 10px;">发布</a> <a href="/tags/并行/" style="font-size: 10px;">并行</a> <a href="/tags/文法/" style="font-size: 10px;">文法</a> <a href="/tags/解析/" style="font-size: 10px;">解析</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
 					</div>
 				</section>
 				
@@ -186,11 +186,11 @@
 </nav>
       <div class="body-wrap">
   
-    <article id="post-编译器架构的王者——LLVM/LLVM函数的调用时声明插入" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/LLVM函数的调用时声明插入/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -199,19 +199,125 @@
       <input type="hidden" class="isFancy" />
     
     
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（8）——更为高级的预处理器PHP/">C和C++的面向对象专题（8）——更为高级的预处理器PHP</a>
+    </h1>
+  
+
+      </header>
+      
+    
     <div class="article-entry" itemprop="articleBody">
       
-        <p>LLVM函数的调用时声明插入</p>
-<p>如果调用一个未声明的函数，我们知道肯定是不正确的，但符号表中，可能预先存有该函数的    FunctionType，这时即使未扫描到该函数，我们也可以用Module中的getOrInsertFunction方法，获取或插入一个函数。</p>
-<p>Constant <em> Module::getOrInsertFunction (<br>    StringRef         Name,<br>    FunctionType </em>     T,<br>    AttributeSet     AttributeList<br>)</p>
-<p>其行为是这样的：</p>
-<ol>
-<li>如果不存在，创建一个原型</li>
-<li>存在，但是一个static的局部函数，那么创建一个新的全局函数替换之</li>
-<li>存在，而且类型正确，返回当前函数</li>
-<li>存在，类型不匹配，那么会在外层包一个constantexpr cast的语句，转换到正确的类型上</li>
-</ol>
-<p>是不是很方便呢？<br>这样应该可以减少一次函数的声明遍历。</p>
+        <p><strong>本专栏文章列表</strong></p>
+<p>一、何为面向对象</p>
+<p>二、C语言也能实现面向对象</p>
+<p>三、C++中的不优雅特性</p>
+<p>四、解决封装，避免接口</p>
+<p>五、合理使用模板，避免代码冗余</p>
+<p>六、C++也能反射</p>
+<p>七、单例模式解决静态成员对象和全局对象的构造顺序难题</p>
+<p>八、更为高级的预处理器PHP</p>
+<p>九、Gtkmm的最佳实践</p>
+<p>本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 <a href="http://sunxfancy.github.io/">http://sunxfancy.github.io/</a></p>
+<h2 id="八、更为高级的预处理器PHP"><a href="#八、更为高级的预处理器PHP" class="headerlink" title="八、更为高级的预处理器PHP"></a>八、更为高级的预处理器PHP</h2><p>C++的宏在某些情况下非常难用，例如将代码展开成为这样：</p>
+<p>Macro( A, B, C, D )</p>
+<p>=&gt;</p>
+<p>func(“A”, A);<br>func(“B”, B);<br>func(“C”, C);<br>func(“D”, D);</p>
+<p>test(A);<br>test(B);<br>test(C);<br>test(D);</p>
+<p>这对于宏来说，太困难了，为了能实现复杂的宏展开，我们希望用更高级的预处理器来实现该功能。</p>
+<p>我们这里使用PHP进行代码的预处理工作，将PHP代码当做C++的宏使用。<br>当然，你也可以用python做代码生成工作，但由于php是内嵌式的，处理起来可能更方便一些，当然，其他语言配上模板也是可以的。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* main.php */</span></span><br><span class="line">&lt;?php $return_m = <span class="string">"return a + b;"</span> ?&gt;</span><br><span class="line"></span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">func</span><span class="params">(<span class="keyword">int</span> a, <span class="keyword">int</span> b)</span> </span>&#123;</span><br><span class="line">    &lt;?php echo $return_m; ?&gt; </span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; func(<span class="number">1</span>, <span class="number">2</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    return <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们用如下指令生成C++代码：</p>
+<pre><code>php main.php &gt; main.cpp
+</code></pre><p>好的，下面就和正常的项目编译一样了，你甚至可以将php的命令写入到makefile中，自动化生成</p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（9）——Gtkmm的最佳实践/">C和C++的面向对象专题（9）——Gtkmm的最佳实践</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><strong>本专栏文章列表</strong></p>
+<p>一、何为面向对象</p>
+<p>二、C语言也能实现面向对象</p>
+<p>三、C++中的不优雅特性</p>
+<p>四、解决封装，避免接口</p>
+<p>五、合理使用模板，避免代码冗余</p>
+<p>六、C++也能反射</p>
+<p>七、单例模式解决静态成员对象和全局对象的构造顺序难题</p>
+<p>八、更为高级的预处理器PHP</p>
+<p>九、Gtkmm的最佳实践</p>
+<p>本系列文章由 西风逍遥游 原创，转载请注明出处：西风广场 <a href="http://sunxfancy.github.io/">http://sunxfancy.github.io/</a></p>
+<h2 id="九、Gtkmm的最佳实践"><a href="#九、Gtkmm的最佳实践" class="headerlink" title="九、Gtkmm的最佳实践"></a>九、Gtkmm的最佳实践</h2><p>在跨平台的gui开发中，Qt一直是非常受欢迎的GUI开发框架，但Qt一个是依赖反射，需要特殊的预处理步骤，一个是库太过庞大，这就造成了一些不便的地方。今天介绍给大家的是Gtk库的C++绑定，Gtkmm，一个方便的跨平台GUI开发框架。</p>
+<p>由于是C++的封装，GTK不再那么的难以使用，变得简洁优雅，而且效率非常高，编译也较QT快许多。<br>虽然C也能编写，而且我们之前也介绍过了GObject的使用。但比较其实现起来较为繁琐，代码行数较C++多一些，而且每个成员函数都要手动传入this指针，较为不便。</p>
+<p>现在C++如果合理的封装和按照之前的设计思想进行设计，结构十分紧凑，而且书写非常方便，非常易用。</p>
+<h3 id="Gtkmm版的2048程序设计"><a href="#Gtkmm版的2048程序设计" class="headerlink" title="Gtkmm版的2048程序设计"></a>Gtkmm版的2048程序设计</h3><p>为了更好的实践，我们举一个简单的2048小游戏的程序作为实例。大家会发现，合理的设计，能够使代码既清晰明了，又方便维护，可靠性很高。<br>我们简要的进行一下程序设计，这里我们不是要学会2048如何制作，而是要体会程序设计中的思想，以及设计中的美感和艺术感。</p>
+<p>首先，2048作为一个简单的小游戏，广受大家喜欢，原理很简单，在一个4×4的数组中，让数字不断向各个方向合并，每次进行后，随机位置创建新数字。</p>
+<p>程序界面，一个窗口，上面一行标签书写当前得分，下面一个绘图界面，自由绘图，画上4×4个的矩阵，上面书写内容。</p>
+<p>程序结构设计，按照一般程序架构设计，可以用MVC的结构，一个界面类，负责显示，一个控制类，负责游戏逻辑，一个模型类，负责数据的存储与管理。</p>
+<p>但由于数据的管理太过简单，就放弃了模型类，直接使用一个4×4的矩阵就完成任务。</p>
+<h3 id="程序实践"><a href="#程序实践" class="headerlink" title="程序实践"></a>程序实践</h3><p>由于Gtkmm的良好封装，我们并不需要太多复杂的处理，首先是Main文件引导程序的启动，所有gtk程序集合都是这样引导。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-05-07 12:22:40</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-05-20 21:58:16</span><br><span class="line">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtkmm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"game.h"</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    Glib::RefPtr&lt;Gtk::Application&gt; app = Gtk::Application::create(argc, argv, <span class="string">"org.abs.gtk2048"</span>);</span><br><span class="line"></span><br><span class="line">    Game game;</span><br><span class="line">    <span class="comment">//Shows the window and returns when it is closed.</span></span><br><span class="line">    return app-&gt;run(game);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Game类作为最核心的窗口类，也是游戏的主要控制类，并不需要暴露什么方法给外部成员使用，所以它的定义很简单：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-05-19 11:20:42</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-05-20 21:58:35</span><br><span class="line">*/</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> GAME_H</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GAME_H</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;gtkmm/window.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> Game_private;</span><br><span class="line"><span class="keyword">class</span> Game : <span class="keyword">public</span> Gtk::Window</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    Game();</span><br><span class="line">    <span class="keyword">virtual</span> ~Game();</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    Game_private* priv;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">// GAME_H</span></span></span><br></pre></td></tr></table></figure></p>
+<p>这种写法，就是在前几章提到的增强代码封装性的方法，通过一个priv指针，解决了C++封装不完善的问题。</p>
+<p>这样还有一个很大的好处就是，由于priv指针的书写较为繁琐，如果在public方法中，反复的通过priv指针调用函数，就会显得无比麻烦，但这正提醒你，你的写法有问题，因为一般的方法，要尽可能写成内部的private的，这样你在不自觉的时刻，就形成了最大化private方法，最小化接口的设计习惯，这对于提升程序的内聚性，很有意义。</p>
+<p>于是我们的Game类的内部定义就变得十分复杂，但这就使得代码内聚性更高，暴露给外层的接口就更简单。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">class Game_private</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    Game_private(Game* game);</span><br><span class="line">    ~Game_private();</span><br><span class="line">    </span><br><span class="line"> 	Game* game;</span><br><span class="line">    MyArea m_area;		// 渲染类</span><br><span class="line">    Gtk::Box m_box;		// 布局控件</span><br><span class="line">    Gtk::Label m_score;	// 得分标签</span><br><span class="line">    int score;			// 得分具体数字</span><br><span class="line">    const static int fx[4][2];</span><br><span class="line"></span><br><span class="line">    int data[4][4];		// 数据模型</span><br><span class="line"></span><br><span class="line">    bool combine(int i, int j, int k); 	// 将一个位置的数字向下合并</span><br><span class="line"></span><br><span class="line">    bool randomNew();	// 随机创建新数字</span><br><span class="line"></span><br><span class="line">    void cleanData();	// 删除全部数字，用来开局初始化</span><br><span class="line"></span><br><span class="line">    void gameWin();		// 显示用户胜利</span><br><span class="line"></span><br><span class="line">    void gameOver();	// 显示游戏结束</span><br><span class="line"></span><br><span class="line">    void gameRun(int k);	// 游戏控制循环</span><br><span class="line"></span><br><span class="line">    bool on_key_press_event(GdkEventKey* event); // 监听键盘事件响应</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>我不喜欢比脸还长的函数，但这里的函数设计的还是不是那么尽如人意，虽然如此，这里也是本着简单易懂的方式设计的。</p>
+<p>这里的combine方法设计的很特殊，因为合并时，还有可能出现游戏胜利的情况，所以里面包含了判断胜利的条件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">bool combine(int i, int j, int k) &#123;</span><br><span class="line">    int ni = i; int nj = j;</span><br><span class="line">    ni += fx[k][0];	// fx是方向数组</span><br><span class="line">    nj += fx[k][1];</span><br><span class="line">    int obji = i, objj = j;</span><br><span class="line">    while ( 0 &lt;= ni &amp;&amp; ni &lt; 4 &amp;&amp;</span><br><span class="line">            0 &lt;= nj &amp;&amp; nj &lt; 4 )		</span><br><span class="line">    // 防止越界，我这里比较贪便宜，很多人处理越界是通过在数组外增加一个特殊值的外边框来处理的</span><br><span class="line">    &#123;</span><br><span class="line">        if (data[ni][nj] == 0) &#123;</span><br><span class="line">            obji = ni; objj = nj;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            if (data[ni][nj] == data[i][j]) &#123;</span><br><span class="line">                score += (1 &lt;&lt; data[ni][nj]);	// 处理得分</span><br><span class="line">                ++data[ni][nj];</span><br><span class="line">                data[i][j] = 0;</span><br><span class="line">                if (data[ni][nj] == 12) return true; // 处理胜利条件</span><br><span class="line">                return false;</span><br><span class="line">            &#125; else break;</span><br><span class="line">        &#125;</span><br><span class="line">        ni += fx[k][0];</span><br><span class="line">        nj += fx[k][1];</span><br><span class="line">    &#125;</span><br><span class="line">    if (!(obji == i &amp;&amp; objj == j)) &#123;	// 未能合并的情况</span><br><span class="line">        data[obji][objj] = data[i][j];</span><br><span class="line">        data[i][j] = 0;</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数设计的很健壮，考虑了许多边界条件，这么做是在模拟物体碰撞时，碰撞面不断挤压的情况。例如下面的情况：<br>1 1 2 4<br>0 0 0 0<br>0 0 0 0<br>0 0 0 0<br>向左合并，能够一次就被合成为8，但这也是和外层的合并顺序控制是分不开的<br>在游戏主循环控制时，是这样处理的，对于不同的方向，循环顺序是不一样的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">void gameRun(int k) &#123;</span><br><span class="line">        bool winflag = false;</span><br><span class="line">        switch (k) &#123;</span><br><span class="line">            case 0 : </span><br><span class="line">                for (int i = 0; i &lt; 4; ++i)</span><br><span class="line">                    for (int j = 0; j &lt; 4; ++j)</span><br><span class="line">                        if (combine(i,j,k)) winflag = true;</span><br><span class="line">            break;</span><br><span class="line">            case 1 : </span><br><span class="line">                for (int j = 3; j &gt;= 0; --j)</span><br><span class="line">                    for (int i = 0; i &lt; 4; ++i)</span><br><span class="line">                        if (combine(i,j,k)) winflag = true;</span><br><span class="line">            break;</span><br><span class="line">            case 2 : </span><br><span class="line">                for (int i = 3; i &gt;= 0; --i)</span><br><span class="line">                    for (int j = 0; j &lt; 4; ++j)</span><br><span class="line">                        if (combine(i,j,k)) winflag = true;</span><br><span class="line">            break;</span><br><span class="line">            case 3 : </span><br><span class="line">                for (int j = 0; j &lt; 4; ++j)</span><br><span class="line">                    for (int i = 0; i &lt; 4; ++i)</span><br><span class="line">                        if (combine(i,j,k)) winflag = true;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        // 判断胜负条件</span><br><span class="line">        if (winflag) &#123;</span><br><span class="line">            gameWin();</span><br><span class="line">            return;</span><br><span class="line">        &#125;</span><br><span class="line">        if (!randomNew()) &#123;</span><br><span class="line">            gameOver();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Glib::RefPtr&lt;Gdk::Window&gt; win = game-&gt;get_window();</span><br><span class="line">        if (win)</span><br><span class="line">        &#123;</span><br><span class="line">            m_area.setData(data);</span><br><span class="line">            Gdk::Rectangle r(0, 0, 600, 600);</span><br><span class="line">            win-&gt;invalidate_rect(r, false);</span><br><span class="line">            m_area.show();</span><br><span class="line">            char score_text[20]; memset(score_text, 0, 20);</span><br><span class="line">            sprintf(score_text, &quot;Score : %d&quot;, score);</span><br><span class="line">            m_score.set_text(score_text);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>而创建新数字的方式也很清晰，但这里使用模拟栈的方式进行了处理。<br>设计很独特，由于目前的位置数目有限，直接rand的方式，效率较低，我们先扫描所有可能的位置，然后将其入栈，random时，直接找一个位置，然后直接随机从其中找一个就可以了。数组模拟栈的方式，主要是希望避免vector的低效率，实现较简易。而且扩展较方便，如果你想random跟多，修改起来也十分方便。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">bool randomNew() &#123;</span><br><span class="line">    int empty_block[17][2]; int sum = 0;</span><br><span class="line">    for (int i = 0; i &lt; 4; ++i) &#123;</span><br><span class="line">        for (int j = 0; j &lt; 4; ++j) &#123;</span><br><span class="line">            if (data[i][j] == 0) &#123;</span><br><span class="line">                empty_block[sum][0] = i; </span><br><span class="line">                empty_block[sum][1] = j;</span><br><span class="line">                ++sum;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    if (sum &lt; 1) return false;</span><br><span class="line"></span><br><span class="line">    int t = rand() % sum;</span><br><span class="line">    data[ empty_block[t][0] ][ empty_block[t][1] ] = (rand() % 4) &lt; 3 ? 1 : 2;</span><br><span class="line">    empty_block[t][0] = empty_block[sum-1][0];</span><br><span class="line">    empty_block[t][1] = empty_block[sum-1][1]; </span><br><span class="line">    --sum;</span><br><span class="line">    </span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>渲染类十分简单，主要就是根据数组中的数值，渲染出对应的图像，设计思想就是不断将问题抽象，不断简化，将复杂的问题从上层一层层拨开，这样就使得结构更加简洁优雅。</p>
+<p>整个项目完整代码已经放到Github上了，需要的可以参考：<br><a href="https://github.com/sunxfancy/Gtk2048" target="_blank" rel="external">【github仓库】</a></p>
 
       
     </div>
@@ -239,8 +345,8 @@
     <article id="post-C和C++的面向对象专题/C和C++的面向对象专题（1）——何为面向对象" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（1）——何为面向对象/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（1）——何为面向对象/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -253,7 +359,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/C和C++的面向对象专题/C和C++的面向对象专题（1）——何为面向对象/">C和C++的面向对象专题（1）——何为面向对象</a>
+      <a class="article-title" href="/2016/04/21/C和C++的面向对象专题/C和C++的面向对象专题（1）——何为面向对象/">C和C++的面向对象专题（1）——何为面向对象</a>
     </h1>
   
 
@@ -313,11 +419,11 @@
 
 
   
-    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -330,7 +436,87 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取/">编译器架构的王者LLVM——（10）变量的存储与读取</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（8）函数的调用及基本运算符/">编译器架构的王者LLVM——（8）函数的调用及基本运算符</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
+<p>版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 <a href="http://blog.csdn.net/xfxyy_sxfancy" target="_blank" rel="external">http://blog.csdn.net/xfxyy_sxfancy</a></p>
+<h1 id="函数的调用及基本运算符"><a href="#函数的调用及基本运算符" class="headerlink" title="函数的调用及基本运算符"></a>函数的调用及基本运算符</h1><p>之前我们提到了函数的定义，那么，定义好的函数如何调用才行呢？今天我们就来了解一下，函数的调用。</p>
+<h2 id="函数调用的宏形式"><a href="#函数调用的宏形式" class="headerlink" title="函数调用的宏形式"></a>函数调用的宏形式</h2><p>我们去读之前对函数调用的语法树翻译形式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;%d\n&quot;, y);</span><br></pre></td></tr></table></figure>
+<p>会被翻译为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Node</span><br><span class="line">             String call</span><br><span class="line">             String printf</span><br><span class="line">             String %d\n</span><br><span class="line">             ID y</span><br></pre></td></tr></table></figure>
+<p>这个宏的名字是call，是个不定参数的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(call 函数名 参数表... )</span><br></pre></td></tr></table></figure></p>
+<p>于是我们就需要扫描参数表，获取全部调用参数。</p>
+<h2 id="调用宏的基本形式"><a href="#调用宏的基本形式" class="headerlink" title="调用宏的基本形式"></a>调用宏的基本形式</h2><p>调用宏其实很简单，就是不断循环判断有多少参数即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">static Value* call_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 参数一 函数名</span><br><span class="line">    </span><br><span class="line">    // 其余参数 要传入的参数</span><br><span class="line">    for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">        // 循环获取参数</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外我们查阅一下LLVM的文档，找到其中CallInst这个指令，LLVM的指令都派生自Instruction，可以发现构建的方法很简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static CallInst * Create (Value *Func, ArrayRef&lt; Value * &gt; Args, const Twine &amp;NameStr, BasicBlock *InsertAtEnd)</span><br></pre></td></tr></table></figure></p>
+<p>但是我们发现，Value中要传输的是一个Function对象，如何获取呢？当然还是从符号表中获取，我们下次会讲符号表的实现，这次也和上节一样，将接口先写出来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 参数一 函数名</span><br><span class="line">Value* func = context-&gt;getFunction(node);</span><br><span class="line">if (func == NULL) &#123;</span><br><span class="line">    errs() &lt;&lt; &quot;找不到函数的定义：&quot;;</span><br><span class="line">    errs() &lt;&lt; node-&gt;getStr().c_str() &lt;&lt; &quot;\n&quot;;</span><br><span class="line">    exit(1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>函数调用在生成时，如果这个函数还没有被扫描到，那么在生成时会报函数定义找不到的问题，这就是我们为什么要用多遍扫描。只有充分的多次扫描语法树，才能获取每个函数后面的函数定义。虽然像C语言那样强制声明也可以，但我个人不大喜欢这种风格。</p>
+<p>至于参数的获取，就十分简单的，但有一点要注意，参数是递归生成的，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">printf(&quot;%d&quot;, add(3, 5));</span><br></pre></td></tr></table></figure>
+<p>这时，我们在获取参数时，就会发现，其中一个参数是表达式，那么我们就要先对其进行处理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 其余参数 要传入的参数</span><br><span class="line">std::vector&lt;Value*&gt; args;</span><br><span class="line">for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">    Value* v = p-&gt;codeGen(context); // 递归地生成参数</span><br><span class="line">    if (v != NULL)</span><br><span class="line">        args.push_back(v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Node类下面有实现codeGen方法，其作用就是重新调用了完整的对当前节点的代码生成，方便递归调用：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Value* Node::codeGen(CodeGenContext* context) &#123;</span><br><span class="line">    return context-&gt;MacroMake(this); // MacroMake是核心的代码生成接口</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>于是我们递归地生成了这些代码，就可以产生一条Call语句，那么别忘记将其返回给上一层：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static Value* call_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 参数一 函数名</span><br><span class="line">    Value* func = context-&gt;getFunction(node);</span><br><span class="line">    if (func == NULL) &#123;</span><br><span class="line">        errs() &lt;&lt; &quot;找不到函数的定义：&quot;;</span><br><span class="line">        errs() &lt;&lt; node-&gt;getStr().c_str() &lt;&lt; &quot;\n&quot;;</span><br><span class="line">        exit(1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    // 其余参数 要传入的参数</span><br><span class="line">    std::vector&lt;Value*&gt; args;</span><br><span class="line">    for (Node* p = node-&gt;getNext(); p != NULL; p = p-&gt;getNext()) &#123;</span><br><span class="line">        Value* v = p-&gt;codeGen(context);</span><br><span class="line">        if (v != NULL)</span><br><span class="line">            args.push_back(v);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    CallInst *call = CallInst::Create(func, args, &quot;&quot;, context-&gt;getNowBlock());</span><br><span class="line">    return call;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="简单运算符计算"><a href="#简单运算符计算" class="headerlink" title="简单运算符计算"></a>简单运算符计算</h2><p>对于计算机，加减乘除这些基本运算，就是几个指令而已，但对于编译器，却也要分好几种情况讨论，因为，全部的运算符有这么多：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// Standard binary operators...</span><br><span class="line"> FIRST_BINARY_INST( 8)</span><br><span class="line">HANDLE_BINARY_INST( 8, Add  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST( 9, FAdd , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(10, Sub  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(11, FSub , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(12, Mul  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(13, FMul , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(14, UDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(15, SDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(16, FDiv , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(17, URem , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(18, SRem , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(19, FRem , BinaryOperator)</span><br><span class="line"></span><br><span class="line">// Logical operators (integer operands)</span><br><span class="line">HANDLE_BINARY_INST(20, Shl  , BinaryOperator) // Shift left  (logical)</span><br><span class="line">HANDLE_BINARY_INST(21, LShr , BinaryOperator) // Shift right (logical)</span><br><span class="line">HANDLE_BINARY_INST(22, AShr , BinaryOperator) // Shift right (arithmetic)</span><br><span class="line">HANDLE_BINARY_INST(23, And  , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(24, Or   , BinaryOperator)</span><br><span class="line">HANDLE_BINARY_INST(25, Xor  , BinaryOperator)</span><br></pre></td></tr></table></figure></p>
+<p>这些定义很难找，在文档中并没有真正写出来，而是在头文件的<code>llvm/IR/Instruction.def</code>里面，这是宏定义的专属部分。<br>这些还仅仅是数值运算，还不算比较运算的部分呢。</p>
+<p>当然，这和计算机体系结构有关，浮点数的运算和整数肯定是不一样的，而我们知道，右移位也分算数右移和逻辑右移。所以必然，会有大量不同的运算符。</p>
+<p>创建指令则很简单：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">static BinaryOperator * Create (BinaryOps Op, Value *S1, Value *S2, const Twine &amp;Name, BasicBlock *InsertAtEnd)</span><br></pre></td></tr></table></figure></p>
+<p>两个运算数，可以是常量，也可以是变量load出值后，还可以是表达式返回值，只要两个Value调用getType，符合运算规则，就可以。<br>注意，浮点数不能直接和整数运算，必须先将整形转为浮点才可以。</p>
+<p>于是以下是简单的运算符操作，我只写了整数的运算操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static Value* opt2_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    std::string opt = node-&gt;getStr();</span><br><span class="line"></span><br><span class="line">    Node* op1 = (node = node-&gt;getNext());</span><br><span class="line">    if (node == NULL) return NULL;</span><br><span class="line">    Node* op2 = (node = node-&gt;getNext());</span><br><span class="line">    if (node == NULL) return NULL;</span><br><span class="line"></span><br><span class="line">    Instruction::BinaryOps instr;</span><br><span class="line">    if (opt == &quot;+&quot;) &#123; instr = Instruction::Add;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;-&quot;) &#123; instr = Instruction::Sub;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;*&quot;) &#123; instr = Instruction::Mul;  goto binOper; &#125;</span><br><span class="line">    if (opt == &quot;/&quot;) &#123; instr = Instruction::SDiv; goto binOper; &#125;</span><br><span class="line"></span><br><span class="line">    // 未知运算符</span><br><span class="line">    return NULL;</span><br><span class="line"></span><br><span class="line">binOper:</span><br><span class="line">    return BinaryOperator::Create(instr, op1-&gt;codeGen(context), </span><br><span class="line">        op2-&gt;codeGen(context), &quot;&quot;, context-&gt;getNowBlock());</span><br></pre></td></tr></table></figure>
+<h2 id="附：文档参考及源代码"><a href="#附：文档参考及源代码" class="headerlink" title="附：文档参考及源代码"></a>附：文档参考及源代码</h2><p><a href="http://llvm.org/doxygen/classllvm_1_1CallInst.html" target="_blank" rel="external">CallInst类参考</a><br><a href="http://llvm.org/doxygen/classllvm_1_1BinaryOperator.html" target="_blank" rel="external">BinaryOperator类参考</a><br><a href="https://github.com/sunxfancy/RedApple/blob/master/src/Macro/Functions.cpp" target="_blank" rel="external">github源码-函数调用及基本运算符</a></p>
+
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（10）变量的存储与读取/">编译器架构的王者LLVM——（10）变量的存储与读取</a>
     </h1>
   
 
@@ -395,8 +581,8 @@
     <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -409,7 +595,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构/">编译器架构的王者LLVM——（1）现代编译器架构</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（1）现代编译器架构/">编译器架构的王者LLVM——（1）现代编译器架构</a>
     </h1>
   
 
@@ -461,8 +647,8 @@
     <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -475,7 +661,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/">编译器架构的王者LLVM——（2）开发LLVM项目</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（2）开发LLVM项目/">编译器架构的王者LLVM——（2）开发LLVM项目</a>
     </h1>
   
 
@@ -534,8 +720,8 @@
     <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -548,7 +734,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码/">编译器架构的王者LLVM——（3）用代码生成代码</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（3）用代码生成代码/">编译器架构的王者LLVM——（3）用代码生成代码</a>
     </h1>
   
 
@@ -691,8 +877,8 @@
     <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（4）简单的词法和语法分析" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（4）简单的词法和语法分析/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（4）简单的词法和语法分析/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -705,7 +891,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（4）简单的词法和语法分析/">编译器架构的王者LLVM——（4）简单的词法和语法分析</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（4）简单的词法和语法分析/">编译器架构的王者LLVM——（4）简单的词法和语法分析</a>
     </h1>
   
 
@@ -768,8 +954,8 @@
     <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（5）语法树模型的基本结构" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（5）语法树模型的基本结构/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（5）语法树模型的基本结构/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
 </a>
     </div>
   
@@ -782,7 +968,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（5）语法树模型的基本结构/">编译器架构的王者LLVM——（5）语法树模型的基本结构</a>
+      <a class="article-title" href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（5）语法树模型的基本结构/">编译器架构的王者LLVM——（5）语法树模型的基本结构</a>
     </h1>
   
 
@@ -819,158 +1005,6 @@
 <p>所以我们这里用一条语句，ConstantExpr::getGetElementPtr，对其取地址，indices是一个数组，第一个值是假设指针是个数组，取数组的第几位的地址，第二个值是假设指针指向的是一个结构体，取结构体中第几条元素的地址。</p>
 <p>这里我们都传常量0就可以了。另外一个需要注意的是，这里取地址的常量0好像不能用int64类型，大概是数据范围太大怕越界吧，一般int32长的数组也够用了。之前我没注意，用int64，总出莫名其妙的问题。</p>
 <h2 id="附：-Node类的完整实现"><a href="#附：-Node类的完整实现" class="headerlink" title="附： Node类的完整实现"></a>附： Node类的完整实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line">/* </span><br><span class="line">* @Author: sxf</span><br><span class="line">* @Date:   2015-09-22 19:21:40</span><br><span class="line">* @Last Modified by:   sxf</span><br><span class="line">* @Last Modified time: 2015-11-01 21:05:14</span><br><span class="line">*/</span><br><span class="line"></span><br><span class="line">#include &quot;Node.h&quot;</span><br><span class="line">#include &lt;stdarg.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &quot;nodes.h&quot;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line"></span><br><span class="line">void Node::init() &#123;</span><br><span class="line">    llvm_type = NULL;</span><br><span class="line">    next = child = NULL; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node::Node() &#123;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node::Node(Node* n) &#123;</span><br><span class="line">    init();</span><br><span class="line">    addChildren(n);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node::~Node() &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Node::addChildren(Node* n) &#123;</span><br><span class="line">    if (child == NULL) &#123;</span><br><span class="line">        child = n;</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        child-&gt;addBrother(n);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Node::addBrother (Node* n) &#123;</span><br><span class="line">    Node* p = this;</span><br><span class="line">    while (p-&gt;next != NULL) &#123;</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">    &#125;</span><br><span class="line">    p-&gt;next = n;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Node::print(int k) &#123;</span><br><span class="line">    for (int i = 0; i &lt; k; ++i)</span><br><span class="line">        printf(&quot;    &quot;);</span><br><span class="line">    printSelf();</span><br><span class="line">    printf(&quot;\n&quot;);</span><br><span class="line"></span><br><span class="line">    Node* p = child; int t = 0;</span><br><span class="line">    while (p != NULL) &#123;</span><br><span class="line">        p-&gt;print(k+1);</span><br><span class="line">        p = p-&gt;next;</span><br><span class="line">        ++t;</span><br><span class="line">    &#125;</span><br><span class="line">    if (t &gt;= 3) printf(&quot;\n&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void Node::printSelf() &#123;</span><br><span class="line">    printf(&quot;Node&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">NodeType Node::getType() &#123;</span><br><span class="line">    return node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isSingle() &#123;</span><br><span class="line">    return next == NULL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node* Node::make_list(int num, ...) &#123;</span><br><span class="line">    va_list argp; Node* para = NULL;  </span><br><span class="line">    Node* ans = NULL;  </span><br><span class="line">    va_start( argp, num );    </span><br><span class="line">    for (int i = 0; i &lt; num; ++i) &#123;    </span><br><span class="line">        para = va_arg( argp, Node* );  </span><br><span class="line">        if (!para-&gt;isSingle()) para = new Node(para);</span><br><span class="line">        if ( ans == NULL )    </span><br><span class="line">        	ans = para;</span><br><span class="line">        else ans-&gt;addBrother(para);</span><br><span class="line">    &#125;    </span><br><span class="line">    va_end( argp );</span><br><span class="line">    return ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node* Node::getList(Node* node) &#123;</span><br><span class="line">    if (!node-&gt;isSingle()) return new Node(node);</span><br><span class="line">    return node;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Type* Node::getLLVMType() &#123;</span><br><span class="line">    return llvm_type;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void  Node::setLLVMType(Type* t) &#123;</span><br><span class="line">    llvm_type = t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isNode() &#123;</span><br><span class="line">    return getType() == node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isIntNode() &#123;</span><br><span class="line">    return getType() == int_node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isFloatNode() &#123;</span><br><span class="line">    return getType() == float_node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isIDNode() &#123;</span><br><span class="line">    return getType() == id_node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isStringNode() &#123;</span><br><span class="line">    return getType() == string_node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">bool Node::isCharNode() &#123;</span><br><span class="line">    return getType() == char_node_t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">std::string Node::getTypeName() &#123;</span><br><span class="line">    switch (getType()) &#123;</span><br><span class="line">        case node_t: return &quot;Node&quot;;</span><br><span class="line">        case int_node_t: return &quot;IntNode&quot;;</span><br><span class="line">        case string_node_t: return &quot;StringNode&quot;;</span><br><span class="line">        case id_node_t: return &quot;IDNode&quot;;</span><br><span class="line">        case char_node_t: return &quot;CharNode&quot;;</span><br><span class="line">        case float_node_t: return &quot;FloatNode&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">std::string&amp; Node::getStr() &#123;</span><br><span class="line">    if (this-&gt;isStringNode()) &#123;</span><br><span class="line">        StringNode* string_this = (StringNode*)this;</span><br><span class="line">        return string_this-&gt;getStr();</span><br><span class="line">    &#125; </span><br><span class="line">    if (this-&gt;isIDNode()) &#123;</span><br><span class="line">        IDNode* string_this = (IDNode*)this;</span><br><span class="line">        return string_this-&gt;getStr();</span><br><span class="line">    &#125; </span><br><span class="line">    std::cerr &lt;&lt; &quot;getStr() - 获取字符串错误, 该类型不正确：&quot; &lt;&lt; getTypeName() &lt;&lt; std::endl;</span><br><span class="line">    exit(1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
-    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统/">编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
-<p>版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 <a href="http://blog.csdn.net/xfxyy_sxfancy" target="_blank" rel="external">http://blog.csdn.net/xfxyy_sxfancy</a></p>
-<h1 id="多遍翻译的宏翻译系统"><a href="#多遍翻译的宏翻译系统" class="headerlink" title="多遍翻译的宏翻译系统"></a>多遍翻译的宏翻译系统</h1><p>上次我们讨论了构建语法树的基本模型，我们能够利用Lex+Bison+Node,几个组件将我们的目标语法翻译成AST语法树了，在第四章，我们也给出了RedApple这款实现型小编译器的语法结构，那么我们的准备工作基于基本完成。</p>
-<p>我们在搞定了AST语法树的构建后，需要有一种机制，能够遍历整棵语法树，然后将其翻译为LLVM的一个模块，然后再输出成.bc字节码。</p>
-<p>这种机制我称其为多趟宏翻译系统，因为它要多次扫描整棵语法树，每次扫描需要的部分，然后构建整个模块。我希望能实现类似Java的语法特性，无需考虑定义顺序，只要定义了，那么就能够找到该符号。这样我们就需要合理的扫描顺序。</p>
-<h2 id="扫描顺序的确定"><a href="#扫描顺序的确定" class="headerlink" title="扫描顺序的确定"></a>扫描顺序的确定</h2><p>首先，我们必须先扫描出所有的类型，因为类型的声明很重要，没有类型声明，就无法构建函数。<br>其次，我们要扫描出所有的函数，为其构建函数的声明。<br>最后，我们扫描出所有的函数定义，构建每个函数的函数体。</p>
-<p>这样我们是三次扫描，无需担心效率问题，因为前两次扫描都是在根节点下一层，扫描的元素非常少，所以处理起来很快。</p>
-<h2 id="待扫描的AST语法树"><a href="#待扫描的AST语法树" class="headerlink" title="待扫描的AST语法树"></a>待扫描的AST语法树</h2><p>这是我们之前生成好的AST语法树，结构还算清晰吧。我们能用的遍历手段也就是上次我们实现的next指针，然后不断的去判断当前节点的数据，然后对应的代码生成出来。</p>
-<p>为了能够区分每条语句的含义，我在每个列表最前，都添加了翻译宏的名称，这个设计是仿照lisp做的，宏相当于是编译器中的函数，处理元数据，然后将其翻译成对应的内容。</p>
-<p>例如这段代码：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">hello</span><span class="params">(<span class="keyword">int</span> k, <span class="keyword">int</span> g)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> y = k + g;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d\n"</span>, y);</span><br><span class="line">    <span class="keyword">if</span> (k + g &lt; <span class="number">5</span>) <span class="built_in">printf</span>(<span class="string">"right\n"</span>);</span><br><span class="line">&#125;	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">go</span><span class="params">(<span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> a = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (a &lt; k) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"go-%d\n"</span>, a);</span><br><span class="line">        a = a + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(<span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i = i+<span class="number">1</span>) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"hello-%d\n"</span>,i);</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"hello world\n"</span>);</span><br><span class="line">    hello(<span class="number">1</span>,<span class="number">2</span>);</span><br><span class="line">    print(<span class="number">9</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>其AST语法树如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br></pre></td><td class="code"><pre><span class="line">Node</span><br><span class="line">    Node</span><br><span class="line">        String function</span><br><span class="line">        String void</span><br><span class="line">        String hello</span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String k</span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String g</span><br><span class="line"></span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String y</span><br><span class="line">                Node</span><br><span class="line">                    String opt2</span><br><span class="line">                    String +</span><br><span class="line">                    ID k</span><br><span class="line">                    ID g</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String call</span><br><span class="line">                String printf</span><br><span class="line">                String %d</span><br><span class="line"></span><br><span class="line">                ID y</span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String if</span><br><span class="line">                Node</span><br><span class="line">                    String opt2</span><br><span class="line">                    String &lt;</span><br><span class="line">                    Node</span><br><span class="line">                        String opt2</span><br><span class="line">                        String +</span><br><span class="line">                        ID k</span><br><span class="line">                        ID g</span><br><span class="line"></span><br><span class="line">                    Int 5</span><br><span class="line"></span><br><span class="line">                Node</span><br><span class="line">                    String call</span><br><span class="line">                    String printf</span><br><span class="line">                    String right</span><br><span class="line"></span><br><span class="line">    Node</span><br><span class="line">        String function</span><br><span class="line">        String void</span><br><span class="line">        String go</span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String k</span><br><span class="line"></span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String a</span><br><span class="line">                Int 0</span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String while</span><br><span class="line">                Node</span><br><span class="line">                    String opt2</span><br><span class="line">                    String &lt;</span><br><span class="line">                    ID a</span><br><span class="line">                    ID k</span><br><span class="line"></span><br><span class="line">                Node</span><br><span class="line">                    Node</span><br><span class="line">                        String call</span><br><span class="line">                        String printf</span><br><span class="line">                        String go-%d</span><br><span class="line"></span><br><span class="line">                        ID a</span><br><span class="line"></span><br><span class="line">                    Node</span><br><span class="line">                        String opt2</span><br><span class="line">                        String =</span><br><span class="line">                        ID a</span><br><span class="line">                        Node</span><br><span class="line">                            String opt2</span><br><span class="line">                            String +</span><br><span class="line">                            ID a</span><br><span class="line">                            Int 1</span><br><span class="line"></span><br><span class="line">    Node</span><br><span class="line">        String function</span><br><span class="line">        String void</span><br><span class="line">        String print</span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String set</span><br><span class="line">                String int</span><br><span class="line">                String k</span><br><span class="line"></span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String for</span><br><span class="line">                Node</span><br><span class="line">                    String set</span><br><span class="line">                    String int</span><br><span class="line">                    String i</span><br><span class="line">                    Int 0</span><br><span class="line"></span><br><span class="line">                Node</span><br><span class="line">                    String opt2</span><br><span class="line">                    String &lt;</span><br><span class="line">                    ID i</span><br><span class="line">                    Int 10</span><br><span class="line"></span><br><span class="line">                Node</span><br><span class="line">                    String opt2</span><br><span class="line">                    String =</span><br><span class="line">                    ID i</span><br><span class="line">                    Node</span><br><span class="line">                        String opt2</span><br><span class="line">                        String +</span><br><span class="line">                        ID i</span><br><span class="line">                        Int 1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">                Node</span><br><span class="line">                    Node</span><br><span class="line">                        String call</span><br><span class="line">                        String printf</span><br><span class="line">                        String hello-%d</span><br><span class="line"></span><br><span class="line">                        ID i</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    Node</span><br><span class="line">        String function</span><br><span class="line">        String void</span><br><span class="line">        String main</span><br><span class="line">        Node</span><br><span class="line">        Node</span><br><span class="line">            Node</span><br><span class="line">                String call</span><br><span class="line">                String printf</span><br><span class="line">                String hello world</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String call</span><br><span class="line">                String hello</span><br><span class="line">                Int 1</span><br><span class="line">                Int 2</span><br><span class="line"></span><br><span class="line">            Node</span><br><span class="line">                String call</span><br><span class="line">                String print</span><br><span class="line">                Int 9</span><br></pre></td></tr></table></figure></p>
-<h2 id="扫描中的上下文"><a href="#扫描中的上下文" class="headerlink" title="扫描中的上下文"></a>扫描中的上下文</h2><p>由于翻译过程中，我们还需要LLVMContext变量，符号表，宏定义表等必要信息，我们还需要自己实现一个上下文类，来存储必要的信息，上下文类需要在第一遍扫描前就初始化好。</p>
-<p>例如我们在翻译中，遇到了一个变量，那么该变量是临时的还是全局的呢？是什么类型，都需要我们在符号表中存储表达，另外当前翻译的语句是属于哪条宏，该怎么翻译？我们必须有一个类来保存这些信息。</p>
-<p>于是我们先不谈实现，将接口写出来</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> CodeGenContext;</span><br><span class="line"><span class="keyword">typedef</span> Value* (*CodeGenFunction)(CodeGenContext*, Node*);</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> _funcReg</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span>*     name;</span><br><span class="line">    CodeGenFunction func;</span><br><span class="line">&#125; FuncReg;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> CodeGenContext</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    CodeGenContext(Node* node);</span><br><span class="line">    ~CodeGenContext();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 必要的初始化方法</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">PreInit</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">PreTypeInit</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Init</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MakeBegin</span><span class="params">()</span> </span>&#123; </span><br><span class="line">        MacroMake(root); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这个函数是用来一条条翻译Node宏的</span></span><br><span class="line">    <span class="function">Value* <span class="title">MacroMake</span><span class="params">(Node* node)</span></span>;</span><br><span class="line">    <span class="comment">// 递归翻译该节点下的所有宏</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">MacroMakeAll</span><span class="params">(Node* node)</span></span>; </span><br><span class="line">    <span class="function">CodeGenFunction <span class="title">getMacro</span><span class="params">(<span class="built_in">string</span>&amp; str)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// C++注册宏</span></span><br><span class="line">    <span class="comment">// void AddMacros(const FuncReg* macro_funcs); // 为只添加不替换保留</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">AddOrReplaceMacros</span><span class="params">(<span class="keyword">const</span> FuncReg* macro_funcs)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 代码块栈的相关操作</span></span><br><span class="line">    <span class="function">BasicBlock* <span class="title">getNowBlock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">BasicBlock* <span class="title">createBlock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">BasicBlock* <span class="title">createBlock</span><span class="params">(Function* f)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前模块中已注册的函数</span></span><br><span class="line">    <span class="function">Function* <span class="title">getFunction</span><span class="params">(Node* node)</span></span>;</span><br><span class="line">    <span class="function">Function* <span class="title">getFunction</span><span class="params">(<span class="built_in">std</span>::<span class="built_in">string</span>&amp; name)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">nowFunction</span><span class="params">(Function* _nowFunc)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setModule</span><span class="params">(Module* pM)</span> </span>&#123; M = pM; &#125;</span><br><span class="line">    <span class="function">Module* <span class="title">getModule</span><span class="params">()</span> </span>&#123; return M; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setContext</span><span class="params">(LLVMContext* pC)</span> </span>&#123; Context = pC; &#125;</span><br><span class="line">    <span class="function">LLVMContext* <span class="title">getContext</span><span class="params">()</span> </span>&#123; return Context; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 类型的定义和查找</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DefType</span><span class="params">(<span class="built_in">string</span> name, Type* t)</span></span>;</span><br><span class="line">    <span class="function">Type* <span class="title">FindType</span><span class="params">(<span class="built_in">string</span>&amp; name)</span></span>;</span><br><span class="line">    <span class="function">Type* <span class="title">FindType</span><span class="params">(Node*)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">SaveMacros</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">RecoverMacros</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isSave</span><span class="params">()</span> </span>&#123; return _save; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setIsSave</span><span class="params">(<span class="keyword">bool</span> save)</span> </span>&#123; _save = save; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">id* <span class="title">FindST</span><span class="params">(Node* node)</span> <span class="keyword">const</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function">id* <span class="title">FindST</span><span class="params">(<span class="built_in">string</span>&amp; str)</span> <span class="keyword">const</span> </span>&#123;</span><br><span class="line">        return st-&gt;find(str);</span><br><span class="line">    &#125;</span><br><span class="line">    IDTable* st;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">    <span class="comment">// 语法树根节点</span></span><br><span class="line">    Node* root;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 当前的LLVM Module</span></span><br><span class="line">    Module* M;</span><br><span class="line">    LLVMContext* Context;</span><br><span class="line">    Function* nowFunc;</span><br><span class="line">    BasicBlock* nowBlock;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 这是用来查找是否有该宏定义的</span></span><br><span class="line">    <span class="built_in">map</span>&lt;<span class="built_in">string</span>, CodeGenFunction&gt; macro_map;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这个栈是用来临时保存上面的查询表的</span></span><br><span class="line">    <span class="built_in">stack</span>&lt;<span class="built_in">map</span>&lt;<span class="built_in">string</span>, CodeGenFunction&gt; &gt; macro_save_stack;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">setNormalType</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用来记录当前是读取还是存入状态</span></span><br><span class="line">    <span class="keyword">bool</span> _save;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<h2 id="宏的注册"><a href="#宏的注册" class="headerlink" title="宏的注册"></a>宏的注册</h2><p>宏是内部的非常重要的函数，本身是一个C函数指针，宏有唯一的名字，通过map表，去查找该宏对应的函数，然后调用其对当前的语法节点进行解析。</p>
-<p>宏函数的定义：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef Value* (*CodeGenFunction)(CodeGenContext*, Node*);</span><br></pre></td></tr></table></figure></p>
-<p>注册我是仿照lua的方式设计的，将函数指针组织成数组，然后初始化进入结构体：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">extern const FuncReg macro_funcs[] = &#123;</span><br><span class="line">    &#123;&quot;function&quot;, function_macro&#125;,</span><br><span class="line">    &#123;&quot;struct&quot;,   struct_macro&#125;,</span><br><span class="line">    &#123;&quot;set&quot;,      set_macro&#125;,</span><br><span class="line">    &#123;&quot;call&quot;,     call_macro&#125;,</span><br><span class="line">    &#123;&quot;opt2&quot;,     opt2_macro&#125;,</span><br><span class="line">    &#123;&quot;for&quot;,      for_macro&#125;,</span><br><span class="line">    &#123;&quot;while&quot;,    while_macro&#125;,</span><br><span class="line">    &#123;&quot;if&quot;,       if_macro&#125;,</span><br><span class="line">    &#123;&quot;return&quot;,   return_macro&#125;,</span><br><span class="line">    &#123;&quot;new&quot;,      new_macro&#125;,</span><br><span class="line">    &#123;NULL, NULL&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>这样写是为了方便我们一次就导入一批函数进入我们的系统。函数指针我还是习惯使用C指针，一般避免使用C++的成员指针，那样太复杂，而且不容易和其他模块链接，因为C++是没有标准ABI的，但C语言有。</p>
-<h2 id="实现扫描的引导"><a href="#实现扫描的引导" class="headerlink" title="实现扫描的引导"></a>实现扫描的引导</h2><p>扫描其实很简单了，如果当前节点是个字符串，而且在宏定义中能够找到，那么我们就调用这条宏来处理，否则如果是列表的化，就对每一条分别递归处理。</p>
-<p>宏的查找我直接使用了stl模版库中的map和string，非常的方便。</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">Value* CodeGenContext::MacroMake(Node* node) &#123;</span><br><span class="line">    <span class="keyword">if</span> (node == <span class="literal">NULL</span>) return <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (node-&gt;isStringNode()) &#123;</span><br><span class="line">        StringNode* str_node = (StringNode*)node;</span><br><span class="line">        CodeGenFunction func = getMacro(str_node-&gt;getStr());</span><br><span class="line">        <span class="keyword">if</span> (func != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            return func(this, node-&gt;getNext());</span><br><span class="line">        &#125; </span><br><span class="line">        return <span class="literal">NULL</span>;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (node-&gt;getChild() != <span class="literal">NULL</span> &amp;&amp; node-&gt;getChild()-&gt;isStringNode())</span><br><span class="line">        return MacroMake(node-&gt;getChild());</span><br><span class="line">    Value* ans;</span><br><span class="line">    <span class="keyword">for</span> (Node* p = node-&gt;getChild(); p != <span class="literal">NULL</span>; p = p-&gt;getNext()) </span><br><span class="line">        ans = MacroMake(p);</span><br><span class="line">    return ans;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">CodeGenFunction CodeGenContext::getMacro(<span class="built_in">string</span>&amp; str) &#123;</span><br><span class="line">    <span class="keyword">auto</span> func = macro_map.find(str);</span><br><span class="line">    <span class="keyword">if</span> (func != macro_map.end()) return func-&gt;second;</span><br><span class="line">    <span class="keyword">else</span> return <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
-    <article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法/" class="article-date">
-  	<time datetime="2016-04-17T15:05:27.631Z" itemprop="datePublished">2016-04-17</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/17/编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法/">编译器架构的王者LLVM——（7）函数的翻译方法</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
-<p>版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 <a href="http://blog.csdn.net/xfxyy_sxfancy" target="_blank" rel="external">http://blog.csdn.net/xfxyy_sxfancy</a></p>
-<h1 id="函数的翻译方法"><a href="#函数的翻译方法" class="headerlink" title="函数的翻译方法"></a>函数的翻译方法</h1><p>前面介绍了许多编译器架构上面的特点，如何组织语法树、如果多遍扫描语法树。今天开始，我们就要设计本编译器中最核心的部分了，如何设计一个编译时宏，再利用LLVM按顺序生成模块。</p>
-<h2 id="设计宏"><a href="#设计宏" class="headerlink" title="设计宏"></a>设计宏</h2><p>我们的编译器可以说是宏驱动的，因为我们扫描每个语法节点后，都会考察当前是不是一个合法的宏，例如我们来分析一下上一章的示例代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void hello(int k, int g) &#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我暂时隐藏了函数体部分，让大家先关注一下函数头</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">String function</span><br><span class="line">      String void</span><br><span class="line">      String hello</span><br><span class="line">      Node</span><br><span class="line">          Node</span><br><span class="line">              String set</span><br><span class="line">              String int</span><br><span class="line">              String k</span><br><span class="line"></span><br><span class="line">          Node</span><br><span class="line">              String set</span><br><span class="line">              String int</span><br><span class="line">              String g</span><br><span class="line"></span><br><span class="line">      Node</span><br><span class="line">      	......</span><br></pre></td></tr></table></figure>
-<p>我们的语法树的每一层相当于是链表组织的，通过next指针都可以找到下一个元素。<br>而语法树的开头部分，是一个“function”的宏名称，这个部分就是提示我们用哪个宏函数来翻译用的。</p>
-<p>接下来的节点就是： 返回类型，函数名，参数表，函数体</p>
-<p>例如参数表，里面的内容很多，但我们扫描时，它们是一个整体，进行识别。</p>
-<p>所以我们的宏的形式实际上就是这样：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(function 返回类型 函数名 (形参表) (函数体))</span><br></pre></td></tr></table></figure>
-<p>括号括起来的部分表示是一个列表，而不是一个元素。</p>
-<h2 id="宏函数的编写"><a href="#宏函数的编写" class="headerlink" title="宏函数的编写"></a>宏函数的编写</h2><p>我们之前已经定义了宏的函数形式，我们需要传入的有我们自己的上下文类和当前要处理的Node节点，返回的是LLVM的Value类型（各个语句的抽象基类）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef Value* (*CodeGenFunction)(CodeGenContext*, Node*);</span><br></pre></td></tr></table></figure>
-<p>于是我们将这个函数实现出来：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">static Value* function_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 第一个参数, 返回类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第二个参数, 函数名</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第三个参数, 参数表</span><br><span class="line">    Node* args_node = node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第四个参数, 代码块</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    return F;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>获取一个字符串代表的类型，往往不是一件容易的事，尤其在存在结构体和类的情况下，这时，我们往往需要查一下符号表，检查这个字符串是否为类型，以及是什么样的类型，是基本类型、结构体，还是函数指针或者指向其他结构的指针等等。<br>获取类型，往往是LLVM中非常重要的一步。</p>
-<p>我们这里先写一下查符号表的接口，不做实现，接下来的章节中，我们会介绍经典的栈式符号表的实现。</p>
-<p>第二个参数是函数名，我们将其保存在临时变量中待用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">static Value* function_type_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 第一个参数, 返回类型</span><br><span class="line">    Type* ret_type = context-&gt;FindType(node);</span><br><span class="line"></span><br><span class="line">    // 第二个参数, 函数名</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line">    std::string function_name = node-&gt;getStr();</span><br><span class="line"></span><br><span class="line">    // 第三个参数, 参数表</span><br><span class="line">    Node* args_node = node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    // 第四个参数, 代码块</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    return F;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接下来的参数表也许是很不好实现的一部分，因为其嵌套比较复杂，不过思路还好，就是不断的去扫描节点，这样我们就可以写出如下的代码：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 第三个参数, 参数表</span><br><span class="line">Node* args_node = node = node-&gt;getNext();</span><br><span class="line">std::vector&lt;Type*&gt; type_vec;   // 类型列表</span><br><span class="line">std::vector&lt;std::string&gt; arg_name; // 参数名列表</span><br><span class="line">if (args_node-&gt;getChild() != NULL) &#123;</span><br><span class="line">    for (Node* pC = args_node-&gt;getChild(); </span><br><span class="line">         pC != NULL; pC = pC-&gt;getNext() ) </span><br><span class="line">    &#123;</span><br><span class="line">        Node* pSec = pC-&gt;getChild()-&gt;getNext();</span><br><span class="line">        Type* t = context-&gt;FindType(pSec);</span><br><span class="line">        type_vec.push_back(t);</span><br><span class="line">        arg_name.push_back(pSec-&gt;getNext()-&gt;getStr());	</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>其实有了前三个参数，我们就可以构建LLVM中的函数声明了，这样是不用写函数体代码的。<br>LLVM里很多对象都有这个特点，函数可以只声明函数头，解析完函数体后再将其填回去。结构体也一样，可以先声明符号，回头再向里填入类型信息。这些特性都是方便生成声明的实现，并且在多遍扫描的实现中也会显得很灵活。</p>
-<p>我们下面来声明这个函数：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 先合成一个函数</span><br><span class="line">FunctionType *FT = FunctionType::get(ret_type, type_vec, </span><br><span class="line">    /*not vararg*/false);</span><br><span class="line"></span><br><span class="line">Module* M = context-&gt;getModule();</span><br><span class="line">Function *F = Function::Create(FT, Function::ExternalLinkage, </span><br><span class="line">    function_name, M);</span><br></pre></td></tr></table></figure>
-<p>这里，我们使用了函数类型，这也是派生自Type的其中一个类，函数类型也可以getPointerTo来获取函数指针类型。<br>另外，如果构建函数时，添加了Function::ExternalLinkage参数，就相当于C语言的extern关键字，确定这个函数要导出符号。这样，你写的函数就能够被外部链接，或者作为外部函数的声明使用。</p>
-<h2 id="函数的特殊问题"><a href="#函数的特殊问题" class="headerlink" title="函数的特殊问题"></a>函数的特殊问题</h2><p>接下来我们要创建函数的代码块，但这部分代码实际上和上面的不是在同一个函数中实现的，应该说，他们不是在一趟扫描中。<br>我们知道，如果要让一个函数内的代码块能够调用在任意位置声明的函数，那么我们就必须对所有函数都先处理刚才讲过的前三个参数，这样函数的声明就有了，在之后的正式扫描中，才有了如下的代码块生成部分：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 第四个参数, 代码块</span><br><span class="line">node = node-&gt;getNext();</span><br><span class="line">BasicBlock* bb = context-&gt;createBlock(F); // 创建新的Block</span><br><span class="line"></span><br><span class="line">// 特殊处理参数表, 这个地方特别坑，你必须给每个函数的参数</span><br><span class="line">// 手动AllocaInst开空间，再用StoreInst存一遍才行，否则一Load就报错</span><br><span class="line">// context-&gt;MacroMake(args_node-&gt;getChild());</span><br><span class="line">if (args_node-&gt;getChild() != NULL) &#123;</span><br><span class="line">    context-&gt;MacroMake(args_node);</span><br><span class="line">    int i = 0;</span><br><span class="line">    for (auto arg = F-&gt;arg_begin(); i != arg_name.size(); ++arg, ++i) &#123;</span><br><span class="line">        arg-&gt;setName(arg_name[i]);</span><br><span class="line">        Value* argumentValue = arg;</span><br><span class="line">        ValueSymbolTable* st = bb-&gt;getValueSymbolTable();</span><br><span class="line">        Value* v = st-&gt;lookup(arg_name[i]);</span><br><span class="line">        new StoreInst(argumentValue, v, false, bb);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">context-&gt;MacroMake(node);</span><br><span class="line"></span><br><span class="line">// 处理块结尾</span><br><span class="line">bb = context-&gt;getNowBlock();</span><br><span class="line">if (bb-&gt;getTerminator() == NULL)</span><br><span class="line">    ReturnInst::Create(*(context-&gt;getContext()), bb);</span><br><span class="line">return F;</span><br></pre></td></tr></table></figure>
-<p>这个地方问题非常多，我先保留一个悬念，在接下来代码块和变量存储与加载的讲解中，我会再次提到这个部分的特殊处理。</p>
 
       
     </div>

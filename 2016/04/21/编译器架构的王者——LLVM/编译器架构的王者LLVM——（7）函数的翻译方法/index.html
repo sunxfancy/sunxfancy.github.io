@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>编译器架构的王者LLVM——（7）函数的翻译方法 | 西风广场</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+函数的翻译方法前面介绍了许多编译器架构上面的特点，如何组织语法树、如果多遍扫描语法树。今天开始，我们就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译器架构的王者LLVM——（7）函数的翻译方法">
+<meta property="og:url" content="http://sunxfancy.github.io/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法/index.html">
+<meta property="og:site_name" content="西风广场">
+<meta property="og:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+函数的翻译方法前面介绍了许多编译器架构上面的特点，如何组织语法树、如果多遍扫描语法树。今天开始，我们就">
+<meta property="og:updated_time" content="2016-04-21T14:22:22.930Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="编译器架构的王者LLVM——（7）函数的翻译方法">
+<meta name="twitter:description" content="LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记
+版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 http://blog.csdn.net/xfxyy_sxfancy
+函数的翻译方法前面介绍了许多编译器架构上面的特点，如何组织语法树、如果多遍扫描语法树。今天开始，我们就">
+  
+    <link rel="alternative" href="/atom.xml" title="西风广场" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">西风逍遥游</a></h1>
+		</hgroup>
+
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+							<li><a href="/tags/随笔">随笔</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+					        
+								<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+					        
+								<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/16-04/" style="font-size: 10px;">16.04</a> <a href="/tags/Html/" style="font-size: 10px;">Html</a> <a href="/tags/LLVM/" style="font-size: 10px;">LLVM</a> <a href="/tags/Sphinx/" style="font-size: 10px;">Sphinx</a> <a href="/tags/Ubuntu/" style="font-size: 10px;">Ubuntu</a> <a href="/tags/Xenial/" style="font-size: 10px;">Xenial</a> <a href="/tags/Xerus/" style="font-size: 10px;">Xerus</a> <a href="/tags/中文文档/" style="font-size: 10px;">中文文档</a> <a href="/tags/发布/" style="font-size: 10px;">发布</a> <a href="/tags/并行/" style="font-size: 10px;">并行</a> <a href="/tags/文法/" style="font-size: 10px;">文法</a> <a href="/tags/解析/" style="font-size: 10px;">解析</a> <a href="/tags/随笔/" style="font-size: 10px;">随笔</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.vvliebe.com/">vvliebe的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">西风逍遥游，一只热爱生活的技术粉</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">西风逍遥游</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/sxf.jpg" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">西风逍遥游</h1>
+			</hgroup>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+					<li><a href="/tags/随笔">随笔</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/sunxfancy" title="github">github</a>
+			        
+						<a class="mail" target="_blank" href="mailto:sunxfancy@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="/atom.xml" title="rss">rss</a>
+			        
+						<a class="zhihu" target="_blank" href="http://www.zhihu.com/people/sun-xiao-fan-3" title="zhihu">zhihu</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法/" class="article-date">
+  	<time datetime="2016-04-21T14:22:22.930Z" itemprop="datePublished">2016-04-21</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      编译器架构的王者LLVM——（7）函数的翻译方法
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>LLVM平台，短短几年间，改变了众多编程语言的走向，也催生了一大批具有特色的编程语言的出现，不愧为编译器架构的王者，也荣获2012年ACM软件系统奖 —— 题记</p>
+<p>版权声明：本文为 西风逍遥游 原创文章，转载请注明出处 西风世界 <a href="http://blog.csdn.net/xfxyy_sxfancy" target="_blank" rel="external">http://blog.csdn.net/xfxyy_sxfancy</a></p>
+<h1 id="函数的翻译方法"><a href="#函数的翻译方法" class="headerlink" title="函数的翻译方法"></a>函数的翻译方法</h1><p>前面介绍了许多编译器架构上面的特点，如何组织语法树、如果多遍扫描语法树。今天开始，我们就要设计本编译器中最核心的部分了，如何设计一个编译时宏，再利用LLVM按顺序生成模块。</p>
+<h2 id="设计宏"><a href="#设计宏" class="headerlink" title="设计宏"></a>设计宏</h2><p>我们的编译器可以说是宏驱动的，因为我们扫描每个语法节点后，都会考察当前是不是一个合法的宏，例如我们来分析一下上一章的示例代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">void hello(int k, int g) &#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我暂时隐藏了函数体部分，让大家先关注一下函数头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">String function</span><br><span class="line">      String void</span><br><span class="line">      String hello</span><br><span class="line">      Node</span><br><span class="line">          Node</span><br><span class="line">              String set</span><br><span class="line">              String int</span><br><span class="line">              String k</span><br><span class="line"></span><br><span class="line">          Node</span><br><span class="line">              String set</span><br><span class="line">              String int</span><br><span class="line">              String g</span><br><span class="line"></span><br><span class="line">      Node</span><br><span class="line">      	......</span><br></pre></td></tr></table></figure>
+<p>我们的语法树的每一层相当于是链表组织的，通过next指针都可以找到下一个元素。<br>而语法树的开头部分，是一个“function”的宏名称，这个部分就是提示我们用哪个宏函数来翻译用的。</p>
+<p>接下来的节点就是： 返回类型，函数名，参数表，函数体</p>
+<p>例如参数表，里面的内容很多，但我们扫描时，它们是一个整体，进行识别。</p>
+<p>所以我们的宏的形式实际上就是这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(function 返回类型 函数名 (形参表) (函数体))</span><br></pre></td></tr></table></figure>
+<p>括号括起来的部分表示是一个列表，而不是一个元素。</p>
+<h2 id="宏函数的编写"><a href="#宏函数的编写" class="headerlink" title="宏函数的编写"></a>宏函数的编写</h2><p>我们之前已经定义了宏的函数形式，我们需要传入的有我们自己的上下文类和当前要处理的Node节点，返回的是LLVM的Value类型（各个语句的抽象基类）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">typedef Value* (*CodeGenFunction)(CodeGenContext*, Node*);</span><br></pre></td></tr></table></figure>
+<p>于是我们将这个函数实现出来：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">static Value* function_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 第一个参数, 返回类型</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第二个参数, 函数名</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第三个参数, 参数表</span><br><span class="line">    Node* args_node = node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    // 第四个参数, 代码块</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    return F;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取一个字符串代表的类型，往往不是一件容易的事，尤其在存在结构体和类的情况下，这时，我们往往需要查一下符号表，检查这个字符串是否为类型，以及是什么样的类型，是基本类型、结构体，还是函数指针或者指向其他结构的指针等等。<br>获取类型，往往是LLVM中非常重要的一步。</p>
+<p>我们这里先写一下查符号表的接口，不做实现，接下来的章节中，我们会介绍经典的栈式符号表的实现。</p>
+<p>第二个参数是函数名，我们将其保存在临时变量中待用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">static Value* function_type_macro(CodeGenContext* context, Node* node) &#123;</span><br><span class="line">    // 第一个参数, 返回类型</span><br><span class="line">    Type* ret_type = context-&gt;FindType(node);</span><br><span class="line"></span><br><span class="line">    // 第二个参数, 函数名</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line">    std::string function_name = node-&gt;getStr();</span><br><span class="line"></span><br><span class="line">    // 第三个参数, 参数表</span><br><span class="line">    Node* args_node = node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    // 第四个参数, 代码块</span><br><span class="line">    node = node-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    return F;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来的参数表也许是很不好实现的一部分，因为其嵌套比较复杂，不过思路还好，就是不断的去扫描节点，这样我们就可以写出如下的代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 第三个参数, 参数表</span><br><span class="line">Node* args_node = node = node-&gt;getNext();</span><br><span class="line">std::vector&lt;Type*&gt; type_vec;   // 类型列表</span><br><span class="line">std::vector&lt;std::string&gt; arg_name; // 参数名列表</span><br><span class="line">if (args_node-&gt;getChild() != NULL) &#123;</span><br><span class="line">    for (Node* pC = args_node-&gt;getChild(); </span><br><span class="line">         pC != NULL; pC = pC-&gt;getNext() ) </span><br><span class="line">    &#123;</span><br><span class="line">        Node* pSec = pC-&gt;getChild()-&gt;getNext();</span><br><span class="line">        Type* t = context-&gt;FindType(pSec);</span><br><span class="line">        type_vec.push_back(t);</span><br><span class="line">        arg_name.push_back(pSec-&gt;getNext()-&gt;getStr());	</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实有了前三个参数，我们就可以构建LLVM中的函数声明了，这样是不用写函数体代码的。<br>LLVM里很多对象都有这个特点，函数可以只声明函数头，解析完函数体后再将其填回去。结构体也一样，可以先声明符号，回头再向里填入类型信息。这些特性都是方便生成声明的实现，并且在多遍扫描的实现中也会显得很灵活。</p>
+<p>我们下面来声明这个函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 先合成一个函数</span><br><span class="line">FunctionType *FT = FunctionType::get(ret_type, type_vec, </span><br><span class="line">    /*not vararg*/false);</span><br><span class="line"></span><br><span class="line">Module* M = context-&gt;getModule();</span><br><span class="line">Function *F = Function::Create(FT, Function::ExternalLinkage, </span><br><span class="line">    function_name, M);</span><br></pre></td></tr></table></figure>
+<p>这里，我们使用了函数类型，这也是派生自Type的其中一个类，函数类型也可以getPointerTo来获取函数指针类型。<br>另外，如果构建函数时，添加了Function::ExternalLinkage参数，就相当于C语言的extern关键字，确定这个函数要导出符号。这样，你写的函数就能够被外部链接，或者作为外部函数的声明使用。</p>
+<h2 id="函数的特殊问题"><a href="#函数的特殊问题" class="headerlink" title="函数的特殊问题"></a>函数的特殊问题</h2><p>接下来我们要创建函数的代码块，但这部分代码实际上和上面的不是在同一个函数中实现的，应该说，他们不是在一趟扫描中。<br>我们知道，如果要让一个函数内的代码块能够调用在任意位置声明的函数，那么我们就必须对所有函数都先处理刚才讲过的前三个参数，这样函数的声明就有了，在之后的正式扫描中，才有了如下的代码块生成部分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">// 第四个参数, 代码块</span><br><span class="line">node = node-&gt;getNext();</span><br><span class="line">BasicBlock* bb = context-&gt;createBlock(F); // 创建新的Block</span><br><span class="line"></span><br><span class="line">// 特殊处理参数表, 这个地方特别坑，你必须给每个函数的参数</span><br><span class="line">// 手动AllocaInst开空间，再用StoreInst存一遍才行，否则一Load就报错</span><br><span class="line">// context-&gt;MacroMake(args_node-&gt;getChild());</span><br><span class="line">if (args_node-&gt;getChild() != NULL) &#123;</span><br><span class="line">    context-&gt;MacroMake(args_node);</span><br><span class="line">    int i = 0;</span><br><span class="line">    for (auto arg = F-&gt;arg_begin(); i != arg_name.size(); ++arg, ++i) &#123;</span><br><span class="line">        arg-&gt;setName(arg_name[i]);</span><br><span class="line">        Value* argumentValue = arg;</span><br><span class="line">        ValueSymbolTable* st = bb-&gt;getValueSymbolTable();</span><br><span class="line">        Value* v = st-&gt;lookup(arg_name[i]);</span><br><span class="line">        new StoreInst(argumentValue, v, false, bb);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">context-&gt;MacroMake(node);</span><br><span class="line"></span><br><span class="line">// 处理块结尾</span><br><span class="line">bb = context-&gt;getNowBlock();</span><br><span class="line">if (bb-&gt;getTerminator() == NULL)</span><br><span class="line">    ReturnInst::Create(*(context-&gt;getContext()), bb);</span><br><span class="line">return F;</span><br></pre></td></tr></table></figure>
+<p>这个地方问题非常多，我先保留一个悬念，在接下来代码块和变量存储与加载的讲解中，我会再次提到这个部分的特殊处理。</p>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          编译器架构的王者LLVM——（6）多遍翻译的宏翻译系统
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（9）栈式符号表的构建/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">编译器架构的王者LLVM——（9）栈式符号表的构建</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法" data-title="编译器架构的王者LLVM——（7）函数的翻译方法" data-url="http://sunxfancy.github.io/2016/04/21/编译器架构的王者——LLVM/编译器架构的王者LLVM——（7）函数的翻译方法/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"sunxfancy"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2016 西风逍遥游
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: true
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
